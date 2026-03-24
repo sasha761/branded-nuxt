@@ -1,0 +1,22 @@
+.c-load-icon {
+  display: none;
+  text-align: center;
+  margin-bottom: 10px;
+  
+  svg {
+    animation: rotation 1.3s infinite;
+  }
+
+  &.is-show {
+  	display: block;
+  }
+}
+
+@keyframes rotation {
+  from {
+    transform:rotate(0deg);
+  }
+  to {
+    transform:rotate(360deg);
+  }
+}

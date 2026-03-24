@@ -1,0 +1,40 @@
+.p-checkout {
+  background-color: #fbf8f8;
+  padding-top: 50px;
+  padding-bottom: 50px;
+
+  .l-sidebar-cart {
+    max-width: 100%;
+    margin-left: 0;
+  }
+
+  .l-cart {
+    padding: 20px 35px;
+
+    .c-product-cart {
+      &__info {
+        margin-right: 0;
+      }
+      &__name {
+        width: 100%;
+      }
+
+      .c-total {
+        font-weight: 400;
+      }
+    }
+  }
+
+  h1 {
+    text-transform: inherit;
+    margin-bottom: 25px;
+  }
+
+  @include mq('tablet') {
+    padding-top: 35px;
+
+    .l-cart {
+      padding: 15px 15px;
+    }
+  }
+}

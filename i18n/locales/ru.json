@@ -1,0 +1,23 @@
+{
+  "currency": "грн",
+  "inStock": "в наличии",
+  "outOfStock": "не в наличии",
+  "help": "Помощь",
+  "delivery": "Доставка и оплата",
+  "returns": "Возврат и обмен",
+  "warranty": "Гарантия",
+  "reviews": "Отзывы",
+  "showAll": "Показать все",
+  "sortByDate": "По новизне",
+  "sortPriceAsc": "Цены: по возрастанию",
+  "sortPriceDesc": "Цены: по убыванию",
+  "socialTitle": "Мы в соцсетях",
+  "partnersTitle": "Партнерам",
+  "partnersText": "Подключиться к партнерской программе \"Маркетплейс\"",
+  "delivery_and_return": "Доставка и возврат",
+  "payment_method": "Метод оплаты",
+  "specification": "Спецификация",
+  "out_of_stock": "Нет в наличии",
+  "Read completely": "Читать полностью",
+  "Read less": "Свернуть"
+}

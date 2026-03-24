@@ -1,0 +1,26 @@
+.c-form-cupons {
+	display: flex;
+  position: relative;
+  align-items: center;
+
+  input {
+    background: #fbf8f8;
+    line-height: 16px;
+    padding: 16px 90px 15px 16px;
+    width: 100%;
+  }
+  button {
+    position: absolute;
+    right: 2px;
+    top: 2px;
+    background: #f94942;
+    border-radius: 3px;
+    height: 46px;
+    transition: opacity .3s;
+    width: 46px; 
+
+    svg {
+      fill: var(--white);
+    }
+  }
+}

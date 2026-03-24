@@ -1,0 +1,7 @@
+.p-product {
+  margin-top: 30px;
+
+  @include mq('phone-large') {
+    margin-top: 0;
+  }
+}

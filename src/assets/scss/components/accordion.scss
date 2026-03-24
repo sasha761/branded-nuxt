@@ -1,0 +1,64 @@
+.c-accordion {
+	&__block {
+    margin-bottom: 16px;
+
+		&.is-active {
+			.c-accordion__block-title {
+				svg {
+					transform: rotate(180deg);
+				}
+			}
+		}
+
+		&-title {
+    	font-size: 18px;
+	    line-height: 140%;
+	    padding-bottom: 5px;
+	    border-bottom: 1px solid #000;
+	    position: relative;
+	    display: flex;
+	    align-items: center;
+	    justify-content: space-between;
+	    cursor: pointer;
+
+	    svg {
+  	    transition: all 0.15s ease-in-out;
+	    }
+		}
+
+		&-text {
+      padding: 10px 0;
+			display: none;
+			font-size: 13px;
+	    line-height: 20px;
+
+			// max-height: 0;
+    	// overflow: hidden;
+    	// transition: max-height 0.3s ease-out;
+
+			// &.is-open {
+      //   display: block;
+			// 	max-height: 500px;
+			// }
+
+	    b {
+	    	font-weight: 600;
+	    }
+	    p {
+	    	margin-bottom: 10px
+	    }
+		}
+	}
+
+  @include mq('phone-large') {
+    // padding-bottom: 30px;
+    &__block {
+      margin-bottom: 20px;
+
+      &-title {
+        font-size: 14px;
+        padding-bottom: 10px;
+      }
+    }
+  }
+}

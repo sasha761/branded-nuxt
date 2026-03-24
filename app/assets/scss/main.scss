@@ -1,0 +1,18 @@
+@import 'vendor/style.scss';
+@import 'utility/style.scss';
+@import 'base/style.scss';
+@import 'components/style.scss';
+@import 'layout/style.scss';
+@import 'page/style.scss';
+
+
+img.lazy {
+	position: relative;
+	transition: all 0.2s ease;
+	opacity: 0;
+	
+	&.loaded {
+		opacity: 1;
+	}
+}
+

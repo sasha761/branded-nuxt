@@ -1,0 +1,49 @@
+.c-search {
+	position: relative;
+
+	&__result {
+		position: absolute;
+		right: 0;
+		top: 150%;
+    z-index: 50;
+    // right: -15px;
+    transition: opacity, top, visibility .3s;
+		opacity: 0;
+    visibility: hidden;
+		min-width: 350px;
+    border-radius: 3px;
+
+		&.is-active {
+			opacity: 1;
+    	visibility: visible;
+			top: 120%;
+			background-color: #fff;
+			padding: 15px 15px;
+			border: 1px solid #fbf8f8;
+			box-shadow: 0 10px 20px rgba(50, 50, 50, 0.1);
+			min-height: 60px;
+		}
+
+		.loader {
+			position: absolute;
+			top: 50%;
+			left: 50%;
+			transform: translate(-50%, -50%);
+			z-index: 3;
+		}
+	}
+
+	&__close {
+		position: absolute;
+		top: 5px;
+		right: 5px;
+		z-index: 2;
+		cursor: pointer;
+	}
+
+	.l-mini-cart {
+		&.is-opacity {
+			opacity: 0.4;
+		}
+	}	
+}

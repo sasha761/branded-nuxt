@@ -1,0 +1,34 @@
+.c-price {
+  &.is-sale {
+    display: block;
+    font-weight: bold;
+    font-size: 18px;
+    line-height: 24px;
+    color: #ed753c;
+  }
+
+  &__wrong {
+    text-decoration-line: line-through;
+    color: $grey;
+    margin-left: 8px;
+  }
+  &__sale {
+    font-weight: bold;
+    font-size: 18px;
+    line-height: 24px;
+    color: $red;
+  }
+
+  &__current {
+
+  }
+
+  .screen-reader-text {
+    display: none;
+  }
+
+  ins {
+    color: #F93C00;
+    text-decoration: auto;
+  }
+}

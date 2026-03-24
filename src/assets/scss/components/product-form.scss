@@ -1,0 +1,85 @@
+.c-product-form {
+  margin-bottom: 70px;
+
+  &__variation {
+    display: flex;
+    align-items: center;
+    // flex-wrap: wrap;
+
+    li {
+      display: flex;
+      width: 48px;
+      height: 48px;
+      box-sizing: border-box;
+      border-radius: 3px;
+      border: 1px solid #e5e5e5;
+      color: #333;
+      -webkit-box-align: center;
+      -ms-flex-align: center;
+      -webkit-box-pack: center;
+      -ms-flex-pack: center;
+      justify-content: center;
+      font-size: 12px;
+      line-height: 15px;
+      margin: 0 8px 8px 0;
+      transition: .3s;
+      cursor: pointer;
+      position: relative;
+      text-align: center;
+      align-items: center;
+      padding: 0 2px;
+
+      &.is-active {
+        border-color: #333;
+      }
+    }
+  }
+
+  &__size {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    font-size: 14px;
+    margin-bottom: 8px;
+    color: #898686;
+
+    a {
+      text-decoration: underline;
+      cursor: pointer;
+    }
+  }
+
+  &__btn {
+    display: flex;
+    align-items: center;
+    margin-top: 25px;
+
+    .is-black-border {
+      margin-left: 20px;
+    }
+  }
+
+  .js-product-form-notification {
+    color: red;
+  }
+
+  @include mq('phone-large') {
+    margin-top: 30px;
+    margin-bottom: 30px;
+    // padding-bottom: 30px;
+
+    &__size {
+      margin-bottom: 15px;
+    }
+
+    &__btn {
+      .is-black-border {
+        margin-left: 15px;
+      }
+      .u-btn.is-medium {
+        padding: 10px 10px;
+      }
+    }
+  }
+}

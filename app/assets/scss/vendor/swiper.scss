@@ -1,0 +1,15 @@
+@import 'swiper/css/bundle';
+
+.swiper-pagination {
+	z-index: 1;
+}
+
+.swiper-slide {
+	&.u-col {
+		padding: 0;
+	}
+	.c-product,
+	.c-outlet {
+		padding: 0 15px;
+	}
+}

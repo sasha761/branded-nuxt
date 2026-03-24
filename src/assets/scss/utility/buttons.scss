@@ -1,0 +1,92 @@
+.u-btn {
+	display: inline-block;
+	position: relative;
+	cursor: pointer;
+  font-size: 16px;
+  line-height: 1.2;
+  font-family: Montserrat, sans-serif;
+	font-style: normal;
+	font-weight: 400;
+	text-transform: uppercase;
+	text-align: center;
+  padding: 14px 22px;
+    
+	&.is-medium {
+		padding: 15px 30px;
+	}
+
+	&.is-small {
+    padding: 12px 18px;
+		text-transform: none;
+		font-size: 14px;
+	}
+
+	&.is-black {
+		color: $white;
+		background: $black;
+		border: 1px solid $black;
+	}
+
+	&.is-yellow {
+		color: $white;
+		background-color: #f09948;
+		border: 1px solid #f09948;
+	}
+
+	&.is-orange {
+		color: $white;
+		background-color: $orange;
+		border: 1px solid $orange;
+	}
+
+	&.is-orange-border {
+		color: $orange;
+		border: 1px solid $orange;
+	}
+
+	&.is-grey-border {
+		color: $black;
+		border: 1px solid $light-grey;
+	}
+
+	&.is-black-border {
+		color: $black;
+		border: 1px solid $black;
+	}
+
+	&.is-border-radius {
+		border-radius: 5px;
+	}
+
+	&[disabled] {
+		pointer-events: none;
+		opacity: 0.4;
+	}
+
+	@include mq('phone-large') {
+		padding: 8px 16px;
+		font-size: 14px;
+
+		&.is-medium {
+			padding: 10px 20px;
+		}
+	}
+}
+
+.u-tags {
+	font-size: 28px;
+	line-height: 1;
+	text-align: center;
+	letter-spacing: 0.25em;
+	text-transform: uppercase;
+	margin-left: 50px;
+	color: #F1AB32;
+}
+
+.u-read-more {
+	display: inline-block;
+	cursor: pointer;
+  border-left: 2px solid #f94942;
+  padding: 0 0 0 16px;
+  color: #333;	
+}

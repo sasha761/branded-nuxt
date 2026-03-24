@@ -1,0 +1,23 @@
+{
+  "currency": "грн",
+  "inStock": "в наявності",
+  "outOfStock": "немає в наявності",
+  "help": "Допомога",
+  "delivery": "Доставка та оплата",
+  "returns": "Повернення та обмін",
+  "warranty": "Гарантія",
+  "reviews": "Відгуки",
+  "showAll": "Показати все",
+  "sortByDate": "За новизною",
+  "sortPriceAsc": "Ціни: за зростанням",
+  "sortPriceDesc": "Ціни: за спаданням",
+  "socialTitle": "Ми у соцмережах",
+  "partnersTitle": "Партнерам",
+  "partnersText": "Приєднатися до партнерської програми \"Маркетплейс\"",
+  "delivery_and_return": "Доставка та повернення",
+  "payment_method": "Спосіб оплати",
+  "specification": "Специфікація",
+  "out_of_stock": "Немає в наявності",
+  "Read completely": "Читати повністю",
+  "Read less": "Згорнути"
+}

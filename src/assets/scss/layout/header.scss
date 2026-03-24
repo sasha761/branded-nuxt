@@ -1,0 +1,160 @@
+.l-header {
+	position: relative;
+	margin-bottom: 20px;
+
+	&__top {
+		background: $black;
+    padding: 12px 0;
+
+		&-brand {
+			li {
+				margin-right: 35px;
+				color: $white;
+				font-weight: 500;
+				font-size: 12px;
+				line-height: 15px;
+				display: flex;
+				align-items: center;
+				text-transform: uppercase;
+				font-family: 'Montserrat';
+
+				&:last-child {
+					margin-right: 0;
+				}
+			}
+		}
+	}
+
+	&__bottom {
+		// padding: 40px 0;
+  	border-bottom: 1px solid #E4E4E4;
+
+		&-left {
+			max-width: 50%;
+	    width: 100%;
+			display: flex;
+			text-align: center;
+			justify-content: space-between;
+		}
+
+		&-right {
+	    width: 100%;
+	    display: flex;
+	    align-items: center;
+	    justify-content: flex-end;
+		}
+
+		.c-logo {
+	    margin-right: 50px;
+		}
+
+		.u-container {
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+		}
+
+		.c-search {
+			margin-right: 70px;
+		}
+
+		.c-service {
+			margin-right: 70px;
+		}
+	}
+
+	.c-menu {
+		&__item {
+			font-family: Montserrat;
+			font-style: normal;
+			font-weight: 500;
+			font-size: 14px;
+			line-height: 1.2;
+			text-transform: uppercase;
+			color: #333333;
+			padding: 32px 16px;
+		}
+	}
+
+	@include mq('desktop-wide') {
+		.c-logo {
+	    margin-right: 20px;
+		}
+
+		&__bottom {
+			.c-search,
+			.c-service {
+				margin-right: 20px;
+			}
+		}
+	}
+
+	@include mq('desktop') {
+		&__bottom {
+			.c-search,
+			.c-service {
+				margin-right: 20px;
+			}
+
+			.c-search {
+				display: none;
+			}
+		}
+	}
+
+	@include mq('tablet-wide') {
+		&__bottom {
+			padding: 20px 0;
+
+			.c-menu {
+				display: none;
+			}
+			.c-search {
+				display: none;
+			}
+		}
+	}
+
+	@include mq('tablet') {
+		&__top {
+			display: none;
+		}
+
+		&__bottom {
+			&-right {
+				// justify-content: flex-start;
+				// flex-direction: row-reverse;
+			}
+
+			.c-service {
+				// margin-right: 0;
+				// margin-left: 30px;
+			}
+		}
+	}
+
+	@include mq('phone-large') {
+		.c-logo {
+			margin-right: 15px;
+		}
+
+		&__bottom {
+			&-left {
+				max-width: 130px;
+			}
+		}
+
+		.c-lang {
+			margin-left: 15px;
+    	font-size: 13px;
+		}
+
+		.c-dropdown {
+			font-size: 14px;
+		}
+
+		.c-burger {
+			margin-left: 20px;
+		}
+	}
+}

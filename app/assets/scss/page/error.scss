@@ -1,0 +1,23 @@
+.p-error {
+	margin: 130px 0;
+	text-align: center;
+	h1 {
+		margin-bottom: 20px;
+	}
+
+	p {
+		margin-bottom: 20px;
+		a {
+			text-decoration: underline;
+		}
+	}
+
+	&__search {
+		margin-top: 50px;
+
+		.c-search {
+			max-width: 350px;
+			margin: 0 auto;
+		}
+	}
+}

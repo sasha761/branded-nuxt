@@ -1,0 +1,22 @@
+.l-footer {
+	// margin-top: 100px;
+	background-color: $black;
+	padding: 70px 0;
+
+	.c-social {
+		margin-bottom: 15px;
+	}
+
+	.u-h4 {
+		margin-bottom: 8px;
+	}
+
+	.is-phone {
+		display: inline-block;
+		margin-bottom: 10px;
+	}
+
+	@include mq('tablet-medium') {
+
+	}
+}

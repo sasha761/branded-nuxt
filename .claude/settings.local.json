@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm install --legacy-peer-deps)",
+      "Bash(timeout 30 npx nuxt dev)",
+      "WebFetch(domain:nuxt.com)",
+      "Bash(find /c/OSPanel/home/wp-nuxt2/app/components -name \"*Related\\\\|*Comments\" -type f)",
+      "Bash(find /c/OSPanel/home/wp-nuxt2/app/components/ui -name \"*Product\\\\|*Modal\" -type f)",
+      "Bash(xargs grep:*)",
+      "Bash(head -50 /c/OSPanel/home/wp-nuxt2/app/pages/order-received/[numbers].vue)",
+      "Bash(grep -r \"await\\\\|fetch\\\\|async\\\\|$fetch\" /c/OSPanel/home/wp-nuxt2/app/layouts --include=\"*.vue\" --include=\"*.ts\")",
+      "Bash(find /c/OSPanel/home/wp-nuxt2/server -type f -name *.ts -o -name *.js)"
+    ]
+  }
+}

@@ -1,0 +1,8 @@
+.c-contact-us {
+	background-color: #fff;
+  padding: 20px 50px;
+
+  @include mq('tablet') {
+  	padding: 15px 15px;
+  }
+}
