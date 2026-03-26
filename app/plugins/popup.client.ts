@@ -3,7 +3,11 @@ export default defineNuxtPlugin(() => {
 
   // Close popup on route change
   const router = useRouter()
-  router.afterEach(() => {
+  router.afterEach((to, from) => {
+    if (popupState.value.name === 'PopupFilter' && to.path === from.path) {
+      return
+    }
+
     close()
   })
 

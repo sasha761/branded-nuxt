@@ -22,6 +22,7 @@
               </button>
             </div>
             <LayoutLFilterBlock
+              v-if="products.length"
               :slug="categorySlugFromRoute"
               :products="products"
               :products-count="productsCount"
@@ -29,6 +30,9 @@
             />
 
             <UiCProductList :products="products" />
+            <div v-if="!products.length">
+              <h2 class="u-h3 is-center">{{ te('page_unavailable') ? t('page_unavailable') : 'Данная страница временно недоступна' }}</h2>
+            </div>
 
             <div v-if="showPagination" class="c-pagination">
               <Pagination
@@ -227,12 +231,4 @@ function filterCallback(selectedOption) {
   @import "~/assets/scss/page/shop.scss";
   @import "~/assets/scss/layout/shop.scss";
   @import "~/assets/scss/components/pagination.scss";
-
-  .VuePagination .VuePagination__count {
-    display: none;
-  }
-
-  .VuePagination button {
-    color: white;
-  }
 </style>

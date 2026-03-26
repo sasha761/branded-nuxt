@@ -10,11 +10,11 @@
       </ul>
       <div v-if="totalAmount" class="l-mini-cart__total">
         <span>Сумма заказа</span>
-        <span class="is-bold">{{ totalAmount }}</span>
+        <span class="is-bold">{{ totalAmount }} грн</span>
       </div>
 
       <div class="l-mini-cart__btn" v-if="cartButtons">
-        <NuxtLink :to="localePath('/checkout-2')" class="u-btn is-black">Оформление заказа</NuxtLink>
+        <NuxtLink :to="localePath('/checkout')" class="u-btn is-black">Оформление заказа</NuxtLink>
         <NuxtLink :to="localePath('/cart')" class="is-cart">В корзину</NuxtLink>
       </div>
     </div>

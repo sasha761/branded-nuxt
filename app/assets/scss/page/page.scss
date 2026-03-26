@@ -37,20 +37,22 @@
     	}
     }
 
-    ul {
-    	li {
-		    color: #5a5757;
-    		margin-bottom: 18px;
-    		font-size: 15px;
-    		&.is-active {
-    			color: var(--black);
-    			font-weight: 500;
-    			position: relative;
+	    ul {
+	    	li {
+			    color: #5a5757;
+	    		margin-bottom: 18px;
+	    		font-size: 15px;
+	    		&.is-active,
+	    		a.is-active {
+	    			color: var(--black);
+	    			font-weight: 500;
+	    			position: relative;
+            display: inline-block;
 
-    			&:before {
-		        background: #f94942;
-				    content: "";
-				    display: block;
+	    			&:before {
+			        background: #f94942;
+					    content: "";
+					    display: block;
 				    height: 12px;
 				    left: -10px;
 				    position: absolute;

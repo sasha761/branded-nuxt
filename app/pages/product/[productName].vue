@@ -102,7 +102,6 @@
       </section>
     </div>
     <LayoutLRelated :products="relatedProducts"/>
-    <LayoutLComments />
     <LayoutLSubscribe />
   </main>
 </template>

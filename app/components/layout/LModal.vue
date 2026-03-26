@@ -27,6 +27,10 @@ const popupComponents: Record<string, ReturnType<typeof defineAsyncComponent>> =
     loader: () => import('~/components/popups/PopupSearch.vue'),
     onError(error) { console.error('Failed to load PopupSearch:', error) },
   }),
+  PopupFilter: defineAsyncComponent({
+    loader: () => import('~/components/popups/PopupFilter.vue'),
+    onError(error) { console.error('Failed to load PopupFilter:', error) },
+  }),
   PopupMobileMenuMore: defineAsyncComponent({
     loader: () => import('~/components/popups/PopupMobileMenuMore.vue'),
     onError(error) { console.error('Failed to load PopupMobileMenuMore:', error) },

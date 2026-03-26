@@ -107,6 +107,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
+    flex-wrap: wrap;
     margin-bottom: 20px;
   }
 
@@ -126,6 +127,24 @@
 
   .l-sidebar__list {
     max-height: 175px;
+  }
+
+  @include mq('tablet-wide') {
+    &__result {
+      &-count {
+        width: 100%;
+        order: 3;
+        margin-top: 15px;
+      }
+
+      .l-filter-block__mobile-trigger {
+        order: 1;
+      }
+
+      .c-sort {
+        order: 2;
+      }
+    }
   }
 
   @include mq('tablet') {

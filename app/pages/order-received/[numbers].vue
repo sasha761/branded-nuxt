@@ -1,6 +1,6 @@
 <template>
   <main class="p-thank">
-    <UiCPageLoader v-if="requestInProgress"/>
+    <UiCPageLoader v-if="status !== 'success'"/> 
     <div class="u-container">
       <div class="row">
         <div class="col-lg-6">
@@ -52,27 +52,33 @@
 <script setup>
 const route = useRoute()
 const cartStore = useCartStore()
-const { requestInProgress, waitRequest } = useWaitRequest()
 
-const orderData = ref({})
-const products = ref([])
-
-onMounted(() => {
-  waitRequest(async () => {
-    try {
-      const result = await $fetch('/api/cart/get_order_info', {
-        params: {
-          order_id: route.params.numbers,
-        },
-      })
-      orderData.value = result.order_data
-      products.value = result.products
-      cartStore.setProductToCart([])
-    } catch (error) {
-      console.error(error)
-    }
-  })
+const orderId = computed(() => {
+  const param = route.params.numbers
+  return Array.isArray(param) ? param[0] : param
 })
+
+const { status, data: orderInfo } = useFetch('/api/cart/get_order_info', {
+  params: {
+    order_id: orderId,
+  },
+  key: () => `order-info-${orderId.value}`,
+  lazy: true,
+  server: false,
+  default: () => ({
+    order_data: {},
+    products: [],
+  }),
+})
+
+const orderData = computed(() => orderInfo.value.order_data)
+const products = computed(() => orderInfo.value.products)
+
+watch(orderInfo, (value) => {
+  if (value?.order_data?.order_number) {
+    cartStore.setProductToCart([])
+  }
+}, { immediate: true })
 </script>
 
 <style lang="scss">

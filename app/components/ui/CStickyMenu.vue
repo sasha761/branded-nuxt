@@ -6,14 +6,14 @@
           <svg width="20px" height="20px">
             <use xlink:href="#icon-home"></use>
           </svg>
-          <span>Main</span>
+          <span>{{ te('main') ? t('main') : 'Main' }}</span>
         </NuxtLink>
       </li>
       <li class="c-sticky-menu__item" @click="mobileMenuModal" data-modal="#mobile-menu">
         <svg width="24px" height="20px">
           <use xlink:href="#catalog"></use>
         </svg>
-        <span>Catalog</span>
+        <span>{{ te('catalog') ? t('catalog') : 'Catalog' }}</span>
       </li>
       <li>
         <NuxtLink :to="localePath('/cart')" class="c-sticky-menu__item">
@@ -32,20 +32,20 @@
           <svg width="20px" height="20px">
             <use xlink:href="#bag"></use>
           </svg>
-          <span>Cart</span>
+          <span>{{ te('cart') ? t('cart') : 'Cart' }}</span>
         </NuxtLink>
       </li>
       <li class="c-sticky-menu__item" @click="mobileSearchModal" data-modal="#mobile-search">
         <svg width="17px" height="20px" stroke="#333">
           <use xlink:href="#search"></use>
         </svg>
-        <span>Search</span>
+        <span>{{ te('search') ? t('search') : 'Search' }}</span>
       </li>
       <li class="c-sticky-menu__item" @click="mobileMenuMoreModal" data-modal="#mobile-menu-more">
         <svg width="30px" height="20px">
           <use xlink:href="#dots"></use>
         </svg>
-        <span>More</span>
+        <span>{{ te('more') ? t('more') : 'More' }}</span>
       </li>
     </ul>
   </section>
@@ -62,6 +62,9 @@ const props = defineProps({
 const localePath = useLocalePath()
 const cartStore = useCartStore()
 const { open } = usePopup()
+
+const { t, te } = useI18n()
+
 
 function mobileSearchModal() {
   open('PopupSearch', { menu: props.mobileMenu })

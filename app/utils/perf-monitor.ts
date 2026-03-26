@@ -112,7 +112,7 @@ export function getRouteType(fullPath: string): string {
       return 'brand'
     case 'cart':
       return 'cart'
-    case 'checkout-2':
+    case 'checkout':
       return 'checkout'
     case 'order-received':
       return 'order'

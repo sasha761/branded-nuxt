@@ -52,3 +52,21 @@
     }
   }
 }
+
+.VuePagination .VuePagination__count {
+  display: none;
+}
+
+.VuePagination {
+  button {
+    color: white;
+  }
+
+  &__pagination-item {
+    &.disabled {
+      opacity: 0;
+      visibility: hidden;
+      cursor: not-allowed;
+    }
+  }
+}

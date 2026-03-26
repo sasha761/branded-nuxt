@@ -6,7 +6,7 @@
           <use xlink:href="#search"></use>
         </svg>
       </button>
-      <input type="text" v-model="searchInput" placeholder="Поиск" @keydown.enter="fetchSearch" />
+      <input type="text" name="search" v-model="searchInput" :placeholder="t('search') " />
     </form>
 
     <div class="c-search__result" :class="{'is-active': searchContainerVisability}">
@@ -14,7 +14,7 @@
       <svg v-if="searchResult.length > 0" @click="handleCloseClick" width="20px" height="20px" class="c-search__close">
         <use xlink:href="#icon-close"></use>
       </svg>
-      <p v-if="!searchResult.length && !requestInProgress">По вашему запросу ничего не найдено!</p>
+      <p v-if="!searchResult.length && !requestInProgress">{{ t('no_results') }}</p>
       <div v-if="searchResult.length > 0" class="l-mini-cart" :class="{'is-opacity': requestInProgress}">
         <ul class="l-mini-cart__list">
           <li v-for="(product, index) in searchResult" :key="index" class="l-mini-cart__item">
@@ -27,7 +27,7 @@
 </template>
 
 <script setup>
-const { locale } = useI18n()
+const { locale, t } = useI18n()
 const localePath = useLocalePath()
 const router = useRouter()
 const { requestInProgress, waitRequest } = useWaitRequest()
@@ -40,7 +40,10 @@ const debounceTimeout = ref(null)
 watch(searchInput, (newValue) => {
   if (newValue.length >= 3) {
     debouncedSearch()
+    return
   }
+
+  clearDebounceTimeout()
 })
 
 function fetchSearch() {
@@ -49,7 +52,7 @@ function fetchSearch() {
   waitRequest(() => {
     return $fetch('/api/search/search', {
       method: 'POST',
-      body: { lang: locale.value, query: searchInput.value },
+      body: { lang: locale.value, query: searchInput.value, posts_per_page: 7 },
     })
     .then((result) => {
       searchResult.value = result?.products || []
@@ -66,8 +69,15 @@ function handleCloseClick() {
 }
 
 function debouncedSearch() {
-  if (debounceTimeout.value) clearTimeout(debounceTimeout.value)
+  clearDebounceTimeout()
   debounceTimeout.value = setTimeout(() => fetchSearch(), 1000)
+}
+
+function clearDebounceTimeout() {
+  if (!debounceTimeout.value) return
+
+  clearTimeout(debounceTimeout.value)
+  debounceTimeout.value = null
 }
 
 async function goToSearchPage() {
@@ -77,12 +87,13 @@ async function goToSearchPage() {
 }
 
 function handleSearchSubmit() {
+  clearDebounceTimeout()
   goToSearchPage()
   handleCloseClick()
 }
 </script>
 
-<style>
+<style lang="scss">
 @import "~/assets/scss/components/search.scss";
 </style>
 

@@ -54,5 +54,6 @@ const { data: footerMenu } = useAsyncData(
 
 <style lang="scss">
   @import "~/assets/scss/components/footer-menu.scss";
+  @import "~/assets/scss/components/social.scss";
   @import "~/assets/scss/layout/footer.scss";
 </style>

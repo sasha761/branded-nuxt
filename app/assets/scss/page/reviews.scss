@@ -1,3 +1,21 @@
 .p-reviews {
   margin-top: 50px;
+
+  .l-shop {
+    margin-bottom: 20px;
+  }
+
+  .l-reviews {
+    .u-col {
+      margin-bottom: 20px;
+    }
+  }
+
+  .c-pagination {
+    margin-top: 10px;
+  }
+
+  @include mq('phone-large') {
+    margin-top: 30px;
+  }
 }

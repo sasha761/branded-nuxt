@@ -21,7 +21,7 @@
       </div>
 
       <p class="c-price">
-        {{ product.price }}
+        {{ product.price }} грн
       </p>
     </div>
   </div>
@@ -40,3 +40,7 @@ const productLink = computed(() => {
   return stripDomain(props.product?.permalink || '')
 })
 </script>
+
+<style lang="scss">
+@import '~/assets/scss/layout/mini-cart.scss';
+</style>
