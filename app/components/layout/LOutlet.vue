@@ -50,7 +50,7 @@
             <div class="swiper-wrapper">
               <div v-for="(outlet, index) in data" :key="index" class="col-6 u-col swiper-slide">
                 <NuxtLink
-                  :to="stripDomain(outlet.permalink)"
+                  :to="outlet.path"
                   class="c-outlet"
                 >
                   <picture>
@@ -67,14 +67,14 @@
 </template>
 
 <script setup>
-import Swiper from 'swiper/bundle'
+import Swiper from 'swiper'
+import { Autoplay } from 'swiper/modules'
 
 const props = defineProps({
   data: { type: Array },
 })
 
 const localePath = useLocalePath()
-const { stripDomain } = useProductUtils()
 const outletSlider = ref(null)
 let swiperInstance = null
 
@@ -84,6 +84,7 @@ const allSlideIndex = ref(1)
 onMounted(() => {
   if (outletSlider.value) {
     swiperInstance = new Swiper(outletSlider.value, {
+      modules: [Autoplay],
       slidesPerView: 'auto',
       watchOverflow: true,
       autoplay: {

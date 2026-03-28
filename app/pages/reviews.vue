@@ -27,8 +27,8 @@
               </div>
 
               <NuxtLink
-                v-if="review.product_link"
-                :to="getProductLink(review.product_link)"
+                v-if="review.product_path"
+                :to="review.product_path"
                 class="u-h6"
               >
                 {{ review.product_title }}
@@ -75,7 +75,7 @@ import Pagination from 'v-pagination-3'
 const route = useRoute()
 const router = useRouter()
 const { locale, t } = useI18n()
-const { stripDomain } = useProductUtils()
+// const { stripDomain } = useProductUtils()
 const reviewsPerPage = 12
 
 const currentPage = computed(() => {
@@ -201,9 +201,6 @@ function formatReviewDate(value) {
   ).format(parsedDate)
 }
 
-function getProductLink(link) {
-  return stripDomain(link) || '/'
-}
 
 async function pushQuery(nextQuery) {
   const query = { ...nextQuery }

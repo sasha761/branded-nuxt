@@ -26,8 +26,8 @@
           <div class="col-lg-5 col-md-12 u-col">
             <div class="l-product__content">
               <NuxtLink
-                v-if="product.post_brand_url"
-                :to="stripDomain(product.post_brand_url)"
+                v-if="product.post_brand_path"
+                :to="product.post_brand_path"
                 class="l-product__category"
               >
                 {{ product.post_attr_brand }}
@@ -111,7 +111,7 @@ import vSelect from 'vue-select'
 
 const route = useRoute()
 const { locale } = useI18n()
-const { stripDomain } = useProductUtils()
+// const { stripDomain } = useProductUtils()
 const cartStore = useCartStore()
 const { open } = usePopup()
 // const { requestInProgress, waitRequest } = useWaitRequest()
@@ -120,7 +120,7 @@ const { open } = usePopup()
 const productSlug = computed(() => String(route.params.productName || ''))
 
 
-const { data: productPageData, pending } = await useAsyncData(
+const { data: productPageData, pending, error: fetchError } = await useAsyncData(
   `product:${productSlug.value}:${locale.value}`,
   async ( {signal} ) => {
     const [
@@ -173,6 +173,10 @@ const { data: productPageData, pending } = await useAsyncData(
 const product = computed(() => productPageData.value?.product ?? null)
 const seoData = computed(() => productPageData.value?.seo ?? null)
 const breadcrumbs = computed(() => productPageData.value?.breadcrumbs ?? [])
+
+if (fetchError.value) {
+  throw createError({ statusCode: 404, statusMessage: 'Product not found', fatal: true })
+}
 
 
 useSeo(seoData)

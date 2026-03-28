@@ -9,7 +9,10 @@
       "Bash(xargs grep:*)",
       "Bash(head -50 /c/OSPanel/home/wp-nuxt2/app/pages/order-received/[numbers].vue)",
       "Bash(grep -r \"await\\\\|fetch\\\\|async\\\\|$fetch\" /c/OSPanel/home/wp-nuxt2/app/layouts --include=\"*.vue\" --include=\"*.ts\")",
-      "Bash(find /c/OSPanel/home/wp-nuxt2/server -type f -name *.ts -o -name *.js)"
+      "Bash(find /c/OSPanel/home/wp-nuxt2/server -type f -name *.ts -o -name *.js)",
+      "Bash(wc -l /c/OSPanel/home/wp-nuxt2/app/composables/*.ts)",
+      "Bash(find /c/OSPanel/home/wp-nuxt2/app -name *store* -o -name *pinia*)",
+      "Bash(xargs wc:*)"
     ]
   }
 }

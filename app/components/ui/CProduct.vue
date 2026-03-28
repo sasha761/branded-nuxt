@@ -6,7 +6,7 @@
     :data-size="product.post_attr_size"
   >
     <NuxtLink
-      :to="stripDomain(product.permalink)"
+      :to="product.path"
       class="c-product__img"
     >
       <picture>
@@ -52,7 +52,6 @@ defineProps({
 })
 
 const { t, te } = useI18n()
-const { stripDomain } = useProductUtils()
 </script>
 
 <style lang="scss">

@@ -2,7 +2,7 @@
   <nav class="c-breadcrumbs">
     <span v-if="breadcrumbs.length">
       <template v-for="(crumb, i) in breadcrumbs" :key="i">
-        <NuxtLink v-if="crumb.url" :to="localePath(stripDomain(crumb.url))">{{ crumb.text }}</NuxtLink>
+        <NuxtLink v-if="crumb.path" :to="crumb.path">{{ crumb.text }}</NuxtLink>
         <span v-else class="breadcrumb_last" aria-current="page">{{ crumb.text }}</span>
         <span v-if="i < breadcrumbs.length - 1"> - </span>
       </template>
@@ -24,7 +24,6 @@ const props = defineProps({
 const route = useRoute()
 const { locale } = useI18n()
 const localePath = useLocalePath()
-const { stripDomain } = useProductUtils()
 
 const fallbackTitle = computed(() => {
   const slugs = route.params.slug || route.params.brandName || route.params.productName

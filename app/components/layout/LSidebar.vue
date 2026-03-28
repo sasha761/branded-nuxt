@@ -14,7 +14,7 @@
       </h4>
       <ul ref="listRefs" class="l-sidebar__list">
         <li v-for="child in group.children" :key="child.term_id">
-          <NuxtLink :to="stripDomain(child.url)">
+          <NuxtLink :to="child.path">
             {{ child.name }}
           </NuxtLink>
         </li>
@@ -32,7 +32,6 @@ const props = defineProps({
 })
 
 const { locale } = useI18n()
-const { stripDomain } = useProductUtils()
 
 const { data: fetchedSidebar } = props.items
   ? { data: ref([]) }

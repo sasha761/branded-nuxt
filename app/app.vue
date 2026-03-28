@@ -1,9 +1,11 @@
 <template>
   <div>
-    <PartialIconsSvg />
+    
     <NuxtLayout>
       <NuxtPage />
     </NuxtLayout>
+
+    <PartialIconsSvg />
     <!-- <ClientOnly>
       <DebugPerfPanel />
     </ClientOnly> -->

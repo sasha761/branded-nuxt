@@ -4,10 +4,10 @@
     <LayoutLHeroHome v-if="homeData?.data?.banners_group" :data="homeData.data.banners_group" />
     <LayoutLAccessory :data="homeData?.data?.accesories" />
     <LayoutLProductRow :data="homeData?.data?.best_offers" />
-    <LayoutLBrand :data="homeData?.data?.products_brand" />
-    <LayoutLOutlet :data="homeData?.data?.products_sale" />
-    <LayoutLBranded />
-    <LayoutLSubscribe />
+    <LazyLayoutLBrand :data="homeData?.data?.products_brand" />
+    <LazyLayoutLOutlet :data="homeData?.data?.products_sale" />
+    <LazyLayoutLBranded />
+    <LazyLayoutLSubscribe />
   </main>
 </template>
 

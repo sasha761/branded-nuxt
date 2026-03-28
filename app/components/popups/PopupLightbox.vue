@@ -18,8 +18,8 @@
 </template>
 
 <script setup>
-import Swiper from 'swiper/bundle'
-import 'swiper/css/bundle'
+import Swiper from 'swiper'
+import { Autoplay } from 'swiper/modules'
 
 const props = defineProps({
   data: { type: Object },
@@ -39,6 +39,7 @@ const mediaItems = (props.data?.images || []).filter(Boolean).map((src) => {
 
 onMounted(() => {
   swiperInstance = new Swiper(lightboxSlider.value, {
+    modules: [Autoplay],
     slidesPerView: 'auto',
     watchOverflow: true,
     autoplay: {

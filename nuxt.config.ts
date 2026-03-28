@@ -1,5 +1,7 @@
 import { fileURLToPath } from 'node:url'
 
+const wpSiteUrl = process.env.WP_SITE_URL || 'https://branded.com.ua'
+
 export default defineNuxtConfig({
   compatibilityDate: '2025-05-01',
 
@@ -44,9 +46,9 @@ export default defineNuxtConfig({
   },
 
   runtimeConfig: {
-    wpSiteUrl: process.env.WP_SITE_URL || 'https://branded.com.ua',
+    wpSiteUrl,
     public: {
-      wpSiteUrl: process.env.WP_SITE_URL || 'https://branded.com.ua',
+      wpSiteUrl,
     },
   },
 
@@ -57,7 +59,10 @@ export default defineNuxtConfig({
       include: [
         '@vue/devtools-core',
         '@vue/devtools-kit',
-        'swiper/bundle',
+        'swiper',
+        'swiper/modules',
+        'v-pagination-3', // CJS
+        'vue-select',
       ],
     },
     css: {
@@ -71,17 +76,30 @@ export default defineNuxtConfig({
     },
   },
 
-  // routeRules: {
-  //   '/api/menu/**': { cache: { maxAge: 3600 } },
-  //   '/api/archive/get_sidebar': { cache: { maxAge: 600 } },
-  //   '/api/archive/get_filters': { cache: { maxAge: 600 } },
-  //   '/api/home/get_home_info': { cache: { maxAge: 300 } },
-  // },
+  routeRules: {
+    '/api/menu/**': { cache: { maxAge: 3600, staleMaxAge: 86400 } },
+    '/api/archive/get_sidebar': { cache: { maxAge: 600 } },
+    '/api/archive/get_filters': { cache: { maxAge: 600 } },
+    '/api/home/get_home_info': { cache: { maxAge: 300 } },
+    // '/api/seo/**': { cache: { maxAge: 600 } },
+  },
+
+  nitro: {
+    compressPublicAssets: true,
+  },
+
+  experimental: {
+    inlineSSRStyles: false,
+  },
 
   app: {
     head: {
       charset: 'utf-8',
       viewport: 'width=device-width, initial-scale=1',
+      link: [
+        { rel: 'preconnect', href: wpSiteUrl },
+        { rel: 'dns-prefetch', href: wpSiteUrl },
+      ],
     },
   },
 })

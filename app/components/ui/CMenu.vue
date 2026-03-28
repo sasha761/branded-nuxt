@@ -1,22 +1,22 @@
 <template>
   <ul class="c-menu">
     <li class="c-menu__item">
-      <a href="https://branded.com.ua/sales" class="d-flex align-items-center">
+      <NuxtLink :to="localePath('/sales')" class="d-flex align-items-center">
         <svg width="18px" height="18px" style="margin-right: 6px">
           <use xlink:href="#sales"></use>
         </svg>
         <span>Sales</span>
-      </a>
+      </NuxtLink>
     </li>
     <li class="c-menu__item" v-for="(item, index) in headerMenu" :key="index">
-      <NuxtLink :to="localePath(item.slug)">
+      <NuxtLink :to="item.path">
         <span>{{ item.title }}</span>
       </NuxtLink>
 
       <div v-if="item.submenu.length" class="c-menu__container js-sub-menu">
         <ul class="c-sub-menu" :class="{ 'is-child-3': item.submenu[0].submenu.length }">
           <li v-for="(item2, index2) in item.submenu" :key="index2" class="c-sub-menu__item">
-            <NuxtLink :to="localePath(item2.slug)" :class="{'c-sub-menu__item-subtitle': item2.submenu.length }">
+            <NuxtLink :to="item2.path" :class="{'c-sub-menu__item-subtitle': item2.submenu.length }">
               <span>{{ item2.title }}</span>
             </NuxtLink>
 
@@ -28,14 +28,14 @@
                     <use xlink:href="#icon-caret"></use>
                   </svg>
                 </div>
-                <NuxtLink :to="localePath(item3.slug)" v-else>
+                <NuxtLink :to="item3.path" v-else>
                   <span>{{ item3.title }}</span>
                 </NuxtLink>
 
                 <div v-if="item3.submenu.length" class="js-list">
                   <ul class="c-sub-menu-4 u-sub-menu">
                     <li class="c-item-4" v-for="(item4, index4) in item3.submenu" :key="index4">
-                      <NuxtLink :to="localePath(item4.slug)">
+                      <NuxtLink :to="item4.path">
                         <span>{{ item4.title }}</span>
                       </NuxtLink>
                     </li>

@@ -37,7 +37,8 @@
 </template>
 
 <script setup>
-import Swiper from 'swiper/bundle'
+import Swiper from 'swiper'
+import { Autoplay } from 'swiper/modules'
 
 const props = defineProps({
   products: { type: Array, default: () => [] },

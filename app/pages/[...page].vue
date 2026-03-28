@@ -11,7 +11,7 @@
                 :key="page.ID"
                 >
                 <NuxtLink 
-                  :to="getPageLink(page.link)"
+                  :to="page.path"
                   exact-active-class="is-active"
                 >
                   {{ page.title }}
@@ -43,11 +43,11 @@
 
 <script setup>
 const route = useRoute()
-const localePath = useLocalePath()
+// const localePath = useLocalePath()
 const { locale } = useI18n()
-const { stripDomain } = useProductUtils()
+// const { stripDomain } = useProductUtils()
 
-const { data: pageData, pending: requestInProgress } = await useAsyncData(
+const { data: pageData, pending: requestInProgress, error: fetchError } = await useAsyncData(
   `page:${route.path}:${locale.value}`,
   async () => {
     const [pageResult, seoResult] = await Promise.all([
@@ -68,6 +68,10 @@ const { data: pageData, pending: requestInProgress } = await useAsyncData(
       }),
     ])
 
+    if (!pageResult) {
+      throw createError({ statusCode: 404, statusMessage: 'Page not found' })
+    }
+
     return { content: pageResult, seo: seoResult }
   },
   {
@@ -79,13 +83,8 @@ const { data: pageData, pending: requestInProgress } = await useAsyncData(
 const content = computed(() => pageData.value?.content ?? null)
 const seoRef = computed(() => pageData.value?.seo ?? null)
 
-function normalizePagePath(link) {
-  const normalized = stripDomain(link).replace(/\/+$/, '')
-  return normalized || '/'
-}
-
-function getPageLink(link) {
-  return localePath(normalizePagePath(link))
+if (fetchError.value) {
+  throw createError({ statusCode: 404, statusMessage: 'Page not found', fatal: true })
 }
 
 useSeo(seoRef)

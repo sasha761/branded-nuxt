@@ -32,7 +32,7 @@
       <NuxtLink
         v-for="(item, index) in data"
         :key="index"
-        :to="stripDomain(item.link)"
+        :to="item.path"
         class="l-accessory__block"
         :class="{ 'is-first': index === 0, 'is-second': index === 1 }"
       >
@@ -61,7 +61,6 @@ const props = defineProps({
 })
 
 const localePath = useLocalePath()
-const { stripDomain } = useProductUtils()
 </script>
 
 <style lang="scss" scoped>

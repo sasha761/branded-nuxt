@@ -7,7 +7,7 @@
             <h3 class="c-footer-menu__title">{{ item.title }}</h3>
             <ul v-if="item.submenu">
               <li v-for="(item2, index2) in item.submenu" :key="index2" class="c-footer-menu__items">
-                <NuxtLink :to="localePath(item2.slug)">{{ item2.title }}</NuxtLink>
+                <NuxtLink :to="item2.path">{{ item2.title }}</NuxtLink>
               </li>
             </ul>
           </div>
@@ -36,7 +36,6 @@
 
 <script setup>
 const { locale } = useI18n()
-const localePath = useLocalePath()
 const footerKey = computed(() => `footer-menu:${locale.value}`)
 
 const { data: footerMenu } = useAsyncData(

@@ -8,7 +8,7 @@
               <NuxtLink
                 v-for="(item, index) in data.banners"
                 :key="index"
-                :to="localePath(item.link)"
+                :to="item.path"
                 class="c-banner swiper-slide"
               >
                 <picture>
@@ -17,6 +17,8 @@
                     width="1400"
                     height="616"
                     :alt="'Branded баннер ' + index"
+                    :fetchpriority="index === 0 ? 'high' : 'low'"
+                    :loading="index === 0 ? 'eager' : 'lazy'"
                   >
                 </picture>
                 <h1 v-if="index === data.banners.length - 1" class="c-banner__title">
@@ -57,7 +59,7 @@
 </template>
 
 <script setup>
-import Swiper from 'swiper/bundle'
+import Swiper from 'swiper'
 
 const props = defineProps({
   data: { type: Object },
@@ -65,6 +67,15 @@ const props = defineProps({
 
 const localePath = useLocalePath()
 const bannerSlider = ref(null)
+
+const firstBannerImg = computed(() => props.data?.banners?.[0]?.img)
+useHead({
+  link: computed(() =>
+    firstBannerImg.value
+      ? [{ rel: 'preload', as: 'image', href: firstBannerImg.value }]
+      : []
+  ),
+})
 
 onMounted(() => {
   if (bannerSlider.value) {

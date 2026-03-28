@@ -10,7 +10,7 @@
       class="c-product-cart"
     >
       <NuxtLink
-        :to="stripDomain(product.permalink)"
+        :to="product.path"
         class="c-product-cart__img"
       >
         <img :src="product.post_img_m" :alt="product.name" />
@@ -19,8 +19,8 @@
       <div class="c-product-cart__info">
         <div class="c-product-cart__name">
           <NuxtLink
-            v-if="product.post_brand_url"
-            :to="stripDomain(product.post_brand_url)"
+            v-if="product.post_brand_path"
+            :to="product.post_brand_path"
             class="c-product-cart__name-brand"
           >
             {{ texts.brandPrefix }}
@@ -36,7 +36,7 @@
           </div>
 
           <NuxtLink
-            :to="stripDomain(product.permalink)"
+            :to="product.path"
             class="c-product-cart__name-title"
           >
             {{ product.name }}
@@ -116,7 +116,6 @@ const props = defineProps({
 
 const cartStore = useCartStore()
 const { locale } = useI18n()
-const { stripDomain } = useProductUtils()
 
 const cartProducts = computed(() => cartStore.cartProducts)
 const texts = computed(() => (

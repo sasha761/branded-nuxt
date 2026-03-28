@@ -11,7 +11,7 @@
           <NuxtLink
             v-for="(item, index) in tabContent"
             :key="index"
-            :to="localePath(item.slug)"
+            :to="item.path"
             class="c-mobile-menu__item"
           >
             <span>{{ item.title }}</span>

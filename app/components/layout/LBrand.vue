@@ -43,7 +43,8 @@
 </template>
 
 <script setup>
-import Swiper from 'swiper/bundle'
+import Swiper from 'swiper'
+import { Autoplay } from 'swiper/modules'
 import brandBgImg from '~/assets/img/sefsdf.jpg'
 
 const props = defineProps({
@@ -60,6 +61,7 @@ const allSlideIndex = ref(1)
 onMounted(() => {
   if (productRowSlider.value) {
     swiperInstance = new Swiper(productRowSlider.value, {
+      modules: [Autoplay],
       slidesPerView: 'auto',
       watchOverflow: true,
       autoplay: {

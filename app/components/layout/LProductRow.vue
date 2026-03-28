@@ -21,7 +21,8 @@
 </template>
 
 <script setup>
-import Swiper from 'swiper/bundle'
+import Swiper from 'swiper'
+import { Autoplay } from 'swiper/modules'
 
 const props = defineProps({
   data: { type: Array },
@@ -32,6 +33,7 @@ const productRow = ref(null)
 onMounted(() => {
   if (productRow.value) {
     new Swiper(productRow.value, {
+      modules: [Autoplay],
       slidesPerView: 'auto',
       watchOverflow: true,
       autoplay: {
