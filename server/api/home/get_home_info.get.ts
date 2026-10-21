@@ -1,4 +1,4 @@
-export default defineEventHandler(async (event) => {
+export default defineEventHandler((event) => {
   const query = getQuery(event)
-  return await wpFetch('home/get_home_info', { params: query })
+  return wpFetch('home/get_home_info', { params: { lang: wpLang(query.lang) } })
 })
