@@ -38,15 +38,22 @@
             <span class="c-dropdown__current">{{ $t('help') }}</span>
             <svg width="11px" height="7px" class="u-arrow"><use xlink:href="#arrow"></use></svg>
             <ul class="c-dropdown__list">
-              <li><NuxtLink :to="localePath('/dostavka-i-oplata')">{{ $t('delivery') }}</NuxtLink></li>
-              <li><NuxtLink :to="localePath('/vozvrat-i-obmen')">{{ $t('returns') }}</NuxtLink></li>
-              <li><NuxtLink :to="localePath('/garantiya')">{{ $t('warranty') }}</NuxtLink></li>
-              <li><NuxtLink :to="localePath('/reviews')">{{ $t('reviews') }}</NuxtLink></li>
-              <li><a href="tel:+38(066)3156536">+38 (066) 315 65 36</a></li>
+              <li><NuxtLink :to="siteLink('delivery')">{{ $t('delivery') }}</NuxtLink></li>
+              <li><NuxtLink :to="siteLink('returns')">{{ $t('returns') }}</NuxtLink></li>
+              <li><NuxtLink :to="siteLink('warranty')">{{ $t('warranty') }}</NuxtLink></li>
+              <li><NuxtLink :to="siteLink('reviews')">{{ $t('reviews') }}</NuxtLink></li>
+              <li><a href="tel:+380663156536">+38 (066) 315 65 36</a></li>
             </ul>
           </div>
 
-          <UiCLang v-if="languages.length" :langs="languages" :currentLang="locale" @update:currentLang="updateLanguage" />
+          <!-- Пути переводов известны только после загрузки страницы, поэтому ссылки рисуются на клиенте;
+               роботам переводы отдаёт hreflang в <head>. -->
+          <ClientOnly>
+            <UiCLang :langs="languageLinks" :currentLang="locale" @switch="onLanguageSwitch" />
+            <template #fallback>
+              <UiCLang :currentLang="locale" />
+            </template>
+          </ClientOnly>
 
           <div class="c-burger d-block d-sm-none" @click="mobileMenuModal">
             <span></span>
@@ -62,61 +69,39 @@
 
 <script setup>
 const route = useRoute()
-const { locale } = useI18n()
+const { locale, locales } = useI18n()
 const localePath = useLocalePath()
 const switchLocalePath = useSwitchLocalePath()
+const siteLink = useSiteLink()
 const cartStore = useCartStore()
+const alternates = usePageAlternates()
 const { open } = usePopup()
-const { startLanguageSwitchLoader, stopLanguageSwitchLoader } = useLanguageSwitchLoader()
+const { startLanguageSwitchLoader } = useLanguageSwitchLoader()
 
 const activeDropdown = ref(false)
-const menuKey = computed(() => `header-menu:${locale.value}`)
 
-const { data: menuData } = useAsyncData(
-  menuKey,
-  async () => {
-    const [headerMenu, mobileMenu, languagesResponse] = await Promise.all([
-      $fetch('/api/menu/get_menu_header', { params: { lang: locale.value } }),
-      $fetch('/api/menu/get_menu_mobile', { params: { lang: locale.value } }),
-      $fetch('/api/menu/languages', { params: { lang: locale.value, url: route.fullPath } }),
-    ])
+const { data: menus } = useMenus()
 
-    return {
-      headerMenu: headerMenu || [],
-      mobileMenu: mobileMenu || {},
-      languages: languagesResponse?.languages ? Object.values(languagesResponse.languages) : [],
-    }
-  },
-  {
-    watch: [locale],
-    default: () => ({
-      headerMenu: [],
-      mobileMenu: {},
-      languages: [],
-    }),
-    getCachedData(key, nuxtApp) {
-      return nuxtApp.payload.data[key] ?? nuxtApp.static.data[key]
-    },
-  }
-)
+const headerMenu = computed(() => menus.value?.header || [])
+const mobileMenu = computed(() => menus.value?.mobile || {})
 
-const headerMenu = computed(() => menuData.value?.headerMenu || [])
-const mobileMenu = computed(() => menuData.value?.mobileMenu || {})
-const languages = computed(() => menuData.value?.languages || [])
+// Страницы из WP: переводы из api/route (слаги в языках разные), без перевода — главная языка.
+// Страницы фронта (корзина, поиск): меняется только префикс.
+const languageLinks = computed(() => {
+  const items = alternates.value[normalizePath(route.path)]
 
-async function updateLanguage(newLang) {
-  if (newLang === locale.value) return
+  return locales.value.map(({ code }) => {
+    const path = items
+      ? items.find(item => item.lang === code)?.path || localePath('/', code)
+      : switchLocalePath(code) || localePath('/', code)
 
-  const targetPath = switchLocalePath(newLang)
-  if (!targetPath || targetPath === route.fullPath) return
+    return { code, path }
+  })
+})
 
-  startLanguageSwitchLoader()
-
-  try {
-    await navigateTo(targetPath)
-  } catch (error) {
-    stopLanguageSwitchLoader()
-    throw error
+function onLanguageSwitch(code) {
+  if (code !== locale.value) {
+    startLanguageSwitchLoader()
   }
 }
 

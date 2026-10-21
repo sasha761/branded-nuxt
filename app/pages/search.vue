@@ -1,27 +1,19 @@
 <template>
   <main class="p-shop">
-    <UiCPageLoader v-if="pending" />
+    <UiCPageLoader v-if="status === 'pending'" />
     <div class="u-container">
-      <UiCBreadcrumbs :items="breadcrumbs" />
+      <UiCBreadcrumbs :title="pageTitle" />
 
       <section class="l-shop">
         <h1 class="u-h2">{{ pageTitle }}</h1>
 
-        <UiCProductList :products="products" />
+        <UiCProductList :products="products" :list-context="{ listName: 'Search results' }" />
 
         <h2 v-if="showEmptyState" class="u-h3 is-center">
           {{ t('no_results') }}
         </h2>
 
-        <div v-if="showPagination" class="c-pagination">
-          <Pagination
-            v-model="page"
-            :records="productsCount"
-            :per-page="productsPerPage"
-            :options="{ texts: null }"
-            @paginate="paginationCallback"
-          />
-        </div>
+        <UiCPagination :page="currentPage" :total-pages="totalPages" />
       </section>
     </div>
     <LayoutLSubscribe />
@@ -29,11 +21,10 @@
 </template>
 
 <script setup>
-import Pagination from 'v-pagination-3'
-
 const route = useRoute()
-const router = useRouter()
 const { locale, t } = useI18n()
+const analytics = useAnalytics()
+const currentPage = useCurrentPage()
 const productsPerPage = 16
 
 const searchQuery = computed(() => {
@@ -41,43 +32,19 @@ const searchQuery = computed(() => {
   return typeof rawValue === 'string' ? rawValue.trim() : ''
 })
 
-const currentPage = computed(() => {
-  const rawPage = Array.isArray(route.query.page) ? route.query.page[0] : route.query.page
-  const parsedPage = Number(rawPage)
-  return Number.isInteger(parsedPage) && parsedPage > 0 ? parsedPage : 1
-})
-
-const page = ref(currentPage.value)
-
-watch(
-  currentPage,
-  (value) => {
-    page.value = value
-  },
-  { immediate: true }
-)
-
-const searchKey = computed(() => `search:${locale.value}:${searchQuery.value}:${currentPage.value}`)
-
-const { data: searchData, pending } = await useAsyncData(
-  searchKey,
+const { data: searchData, status } = await useAsyncData(
+  () => `search:${locale.value}:${searchQuery.value}:${currentPage.value}`,
   async ({ signal }) => {
-    if (!searchQuery.value) {
-      return {
-        products: [],
-        productsCount: 0,
-        totalPages: 0,
-        perPage: productsPerPage,
-      }
+    // WP ищет от 3 символов
+    if (searchQuery.value.length < 3) {
+      return { products: [], productsCount: 0, totalPages: 0 }
     }
 
     const result = await $fetch('/api/search/search', {
-      method: 'POST',
-      body: {
+      params: {
         lang: locale.value,
         query: searchQuery.value,
         page: currentPage.value,
-        offset: productsPerPage * (currentPage.value - 1),
         posts_per_page: productsPerPage,
       },
       signal,
@@ -87,75 +54,28 @@ const { data: searchData, pending } = await useAsyncData(
       products: result?.products || [],
       productsCount: result?.products_count || 0,
       totalPages: result?.total_pages || 0,
-      perPage: result?.per_page || productsPerPage,
     }
   },
   {
-    default: () => ({
-      products: [],
-      productsCount: 0,
-      totalPages: 0,
-      perPage: productsPerPage,
-    }),
+    default: () => ({ products: [], productsCount: 0, totalPages: 0 }),
   }
 )
 
 const products = computed(() => searchData.value?.products || [])
-const productsCount = computed(() => searchData.value?.productsCount || 0)
 const totalPages = computed(() => searchData.value?.totalPages || 0)
-const showPagination = computed(() => totalPages.value > 1)
 
-const pageTitle = computed(() => {
-  if (!searchQuery.value) {
-    return t('search')
-  }
+const pageTitle = computed(() => (searchQuery.value ? `${t('search')}: ${searchQuery.value}` : t('search')))
 
-  return `${t('search')}: ${searchQuery.value}`
-})
+const showEmptyState = computed(() => Boolean(searchQuery.value) && status.value !== 'pending' && !products.value.length)
 
-const breadcrumbs = computed(() => [
-  { text: t('main'), url: '/' },
-  { text: pageTitle.value },
-])
+// Результаты поиска не индексируются, ссылки на товары — да (как Disallow /search в robots.txt)
+useServicePageHead(pageTitle, 'noindex, follow')
 
-const showEmptyState = computed(() => {
-  return Boolean(searchQuery.value) && !pending.value && !products.value.length
-})
-
-async function pushQuery(nextQuery) {
-  const query = { ...nextQuery }
-
-  Object.keys(query).forEach((key) => {
-    const value = query[key]
-    if (value === undefined || value === null || value === '' || value === '1') {
-      delete query[key]
-    }
-  })
-
-  await router.push({ query })
-}
-
-function paginationCallback(changedPage) {
-  pushQuery({
-    ...route.query,
-    page: String(changedPage),
-  })
-}
-
-useHead(() => ({
-  title: pageTitle.value,
-  meta: [
-    {
-      name: 'description',
-      content: pageTitle.value,
-      key: 'description',
-    },
-  ],
-}))
+onMounted(() => analytics.viewSearchResults(products.value))
+watch(products, value => analytics.viewSearchResults(value))
 </script>
 
 <style lang="scss">
   @import "~/assets/scss/page/shop.scss";
   @import "~/assets/scss/layout/shop.scss";
-  @import "~/assets/scss/components/pagination.scss";
 </style>

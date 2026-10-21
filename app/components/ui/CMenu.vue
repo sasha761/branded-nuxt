@@ -1,7 +1,7 @@
 <template>
   <ul class="c-menu">
     <li class="c-menu__item">
-      <NuxtLink :to="localePath('/sales')" class="d-flex align-items-center">
+      <NuxtLink :to="siteLink('sales')" class="d-flex align-items-center">
         <svg width="18px" height="18px" style="margin-right: 6px">
           <use xlink:href="#sales"></use>
         </svg>
@@ -57,7 +57,7 @@ defineProps({
   },
 })
 
-const localePath = useLocalePath()
+const siteLink = useSiteLink()
 </script>
 
 <style lang="scss">

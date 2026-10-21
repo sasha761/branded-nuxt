@@ -51,8 +51,7 @@ function fetchSearch() {
   searchContainerVisability.value = true
   waitRequest(() => {
     return $fetch('/api/search/search', {
-      method: 'POST',
-      body: { lang: locale.value, query: searchInput.value, posts_per_page: 7 },
+      params: { lang: locale.value, query: searchInput.value.trim(), posts_per_page: 7 },
     })
     .then((result) => {
       searchResult.value = result?.products || []
@@ -82,8 +81,7 @@ function clearDebounceTimeout() {
 
 async function goToSearchPage() {
   if (!searchInput.value.trim()) return
-  const searchUrl = localePath(`/search?s=${encodeURIComponent(searchInput.value)}`)
-  await router.push(searchUrl)
+  await router.push(localePath({ path: '/search/', query: { s: searchInput.value.trim() } }))
 }
 
 function handleSearchSubmit() {

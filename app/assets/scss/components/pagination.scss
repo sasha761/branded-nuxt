@@ -23,8 +23,10 @@
         background-color: #f94942;
       }
 
-      &.VuePagination__pagination-item-next-page {
-        // display: none;
+      &.is-dots {
+        background-color: transparent;
+        color: #333;
+        cursor: default;
       }
 
       &:last-child {
@@ -36,7 +38,8 @@
         height: 100%;
         line-height: 25px;
         text-align: center;
-        // display: block;
+        display: block;
+        color: inherit;
       }
 
       .current {
@@ -49,24 +52,6 @@
         text-align: center;
         line-height: 25px;
       }
-    }
-  }
-}
-
-.VuePagination .VuePagination__count {
-  display: none;
-}
-
-.VuePagination {
-  button {
-    color: white;
-  }
-
-  &__pagination-item {
-    &.disabled {
-      opacity: 0;
-      visibility: hidden;
-      cursor: not-allowed;
     }
   }
 }

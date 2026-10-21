@@ -1,0 +1,45 @@
+User-agent: *
+
+Disallow: /size/
+Disallow: /color/
+Allow: /product/
+Allow: /brand/
+
+Disallow: /cgi-bin
+Disallow: /?
+Disallow: /wp-
+Disallow: /wp/
+Disallow: *?s=
+Disallow: *&s=
+Disallow: /search
+Disallow: /uk/search
+Disallow: /author/
+Disallow: /users/
+Disallow: */trackback
+Disallow: */feed
+Disallow: */rss
+Disallow: */embed$
+Disallow: */wlwmanifest.xml
+Disallow: /xmlrpc.php
+Disallow: *utm*=
+Disallow: *openstat=
+Disallow: /api/
+Disallow: /cart
+Disallow: /uk/cart
+Disallow: /checkout
+Disallow: /uk/checkout
+Disallow: /order-received
+Disallow: /uk/order-received
+Allow: */uploads
+Allow: /_nuxt/
+Allow: /*/*.js
+Allow: /*/*.css
+Allow: /wp-*.png
+Allow: /wp-*.jpg
+Allow: /wp-*.webp
+Allow: /wp-*.jpeg
+Allow: /wp-*.gif
+Allow: /wp-*.mp4
+Allow: */wp-*/*.svg
+
+Sitemap: https://branded.com.ua/sitemap_index.xml

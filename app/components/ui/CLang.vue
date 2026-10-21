@@ -6,22 +6,25 @@
         <use xlink:href="#arrow"></use>
       </svg>
     </div>
-    <div class="c-lang__sub">
-      <div
+    <div v-if="langs.length" class="c-lang__sub">
+      <NuxtLink
         v-for="lang in langs"
-        :key="lang.language_code"
-        @click="changeCurrentLang(lang.language_code)"
+        :key="lang.code"
+        :to="lang.path"
+        :hreflang="lang.code"
         class="c-lang__item"
-      >{{ lang.language_code }}</div>
+        @click="emit('switch', lang.code)"
+      >{{ lang.code }}</NuxtLink>
     </div>
   </div>
 </template>
 
 <script setup>
 defineProps({
+  // [{ code, path }] — путь перевода текущей страницы
   langs: {
     type: Array,
-    required: true,
+    default: () => [],
   },
   currentLang: {
     type: String,
@@ -29,13 +32,9 @@ defineProps({
   },
 })
 
-const emit = defineEmits(['update:currentLang'])
-
-function changeCurrentLang(lang) {
-  emit('update:currentLang', lang)
-}
+const emit = defineEmits(['switch'])
 </script>
-  
+
 <style lang="scss" scoped>
 @import "~/assets/scss/components/lang.scss";
 </style>

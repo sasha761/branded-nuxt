@@ -27,26 +27,10 @@
 import { slideUp, slideDown } from '~/utils/slideToggle'
 
 const props = defineProps({
-  slug: { type: String, default: '' },
-  items: { type: Array, default: null },
+  items: { type: Array, default: () => [] },
 })
 
-const { locale } = useI18n()
-
-const { data: fetchedSidebar } = props.items
-  ? { data: ref([]) }
-  : useAsyncData(
-      `sidebar-${props.slug}-${locale.value}`,
-      () => $fetch('/api/archive/get_sidebar', {
-        params: {
-          lang: locale.value,
-          slug: props.slug,
-        },
-      }),
-      { watch: [locale, () => props.slug] }
-    )
-
-const sidebar = computed(() => props.items || fetchedSidebar.value || [])
+const sidebar = computed(() => props.items || [])
 
 const listRefs = ref([])
 const activeIndex = ref(

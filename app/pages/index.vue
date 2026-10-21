@@ -1,60 +1,33 @@
 <template>
   <main class="p-main">
-    <UiCPageLoader v-if="pending"/>
-    <LayoutLHeroHome v-if="homeData?.data?.banners_group" :data="homeData.data.banners_group" />
-    <LayoutLAccessory :data="homeData?.data?.accesories" />
-    <LayoutLProductRow :data="homeData?.data?.best_offers" />
-    <LazyLayoutLBrand :data="homeData?.data?.products_brand" />
-    <LazyLayoutLOutlet :data="homeData?.data?.products_sale" />
+    <UiCPageLoader v-if="homeStatus === 'pending'"/>
+    <LayoutLHeroHome v-if="homeData?.banners_group" :data="homeData.banners_group" />
+    <LayoutLAccessory :data="homeData?.accesories" />
+    <LayoutLProductRow :data="homeData?.best_offers" />
+    <LazyLayoutLBrand :data="homeData?.products_brand" />
+    <LazyLayoutLOutlet :data="homeData?.products_sale" />
     <LazyLayoutLBranded />
     <LazyLayoutLSubscribe />
   </main>
 </template>
 
 <script setup>
-const route = useRoute()
 const { locale } = useI18n()
+const path = useCurrentPath().value
 
-const { data: homeData, pending } = await useAsyncData(
-  `home:${locale.value}`,
-  async ( {signal} ) => {
-    const [
-      homeResult, 
-      seoResult
-    ] = await Promise.all([
-      $fetch('/api/home/get_home_info', {
-        params: {
-          lang: locale.value,
-        },
-        signal,
-      }),
-      $fetch('/api/seo/get_seo', {
-        method: 'POST',
-        body: {
-          url: route.path,
-          type: 'home',
-        },
-        signal,
-      }),
-    ])
+// SEO главной в её языке (раньше get_seo шёл без lang, и /uk/ получала русские title)
+const [routeRequest, homeRequest] = await Promise.all([
+  useRouteData(path),
+  useAsyncData(`home:${locale.value}`, ({ signal }) => $fetch('/api/home/get_home_info', {
+    params: { lang: locale.value },
+    signal,
+  })),
+])
 
-    return {
-      data: homeResult,
-      seo: seoResult,
-    }
-  },
-  {
-    default: () => ({
-      data: null,
-      seo: null,
-    }),
-  }
-)
+await guardPageRoute(routeRequest.data.value, routeRequest.error.value, homeRequest.error.value)
 
-// console.log('homeData: ', homeData.value);
+const homeData = homeRequest.data
+const homeStatus = homeRequest.status
 
-const seoData = computed(() => homeData.value?.seo ?? null)
-
-useSeo(seoData)
-
+usePageSeo(routeRequest.data)
 </script>

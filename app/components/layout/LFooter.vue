@@ -24,7 +24,7 @@
                 <svg width="28px" height="28px" class="is-telegram"><use xlink:href="#telegram"></use></svg>
               </a>
             </div>
-            <a class="is-phone" href="tel:+38(066)3156536">+38 (066) 315 65 36</a>
+            <a class="is-phone" href="tel:+380663156536">+38 (066) 315 65 36</a>
             <h3 class="u-h4">{{ $t('partnersTitle') }}</h3>
             <p>{{ $t('partnersText') }}</p>
           </div>
@@ -35,20 +35,8 @@
 </template>
 
 <script setup>
-const { locale } = useI18n()
-const footerKey = computed(() => `footer-menu:${locale.value}`)
-
-const { data: footerMenu } = useAsyncData(
-  footerKey,
-  () => $fetch('/api/menu/get_menu_footer', { params: { lang: locale.value } }),
-  {
-    watch: [locale],
-    default: () => [],
-    getCachedData(key, nuxtApp) {
-      return nuxtApp.payload.data[key] ?? nuxtApp.static.data[key]
-    },
-  }
-)
+const { data: menus } = useMenus()
+const footerMenu = computed(() => menus.value?.footer || [])
 </script>
 
 <style lang="scss">

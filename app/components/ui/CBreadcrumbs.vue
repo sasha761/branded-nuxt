@@ -1,62 +1,36 @@
 <template>
-  <nav class="c-breadcrumbs">
-    <span v-if="breadcrumbs.length">
-      <template v-for="(crumb, i) in breadcrumbs" :key="i">
-        <NuxtLink v-if="crumb.path" :to="crumb.path">{{ crumb.text }}</NuxtLink>
+  <nav class="c-breadcrumbs" :aria-label="t('breadcrumbs')">
+    <span>
+      <template v-for="(crumb, i) in crumbs" :key="i">
+        <NuxtLink v-if="crumb.path && i < crumbs.length - 1" :to="crumb.path">{{ crumb.text }}</NuxtLink>
         <span v-else class="breadcrumb_last" aria-current="page">{{ crumb.text }}</span>
-        <span v-if="i < breadcrumbs.length - 1"> - </span>
+        <span v-if="i < crumbs.length - 1"> - </span>
       </template>
-    </span>
-    <span v-else>
-      <NuxtLink :to="localePath('/')">Главная</NuxtLink>
-      <span v-if="fallbackTitle"> - <span class="breadcrumb_last" aria-current="page">{{ fallbackTitle }}</span></span>
     </span>
   </nav>
 </template>
 
 <script setup>
+// Крошки Yoast из api/route (основная категория товара); для страниц фронта — «Главная - заголовок».
 const props = defineProps({
-  type: { type: String, default: '' },
-  url: { type: String, default: '' },
-  items: { type: Array, default: null },
+  items: { type: Array, default: () => [] },
+  title: { type: String, default: '' },
 })
 
-const route = useRoute()
-const { locale } = useI18n()
+const { t } = useI18n()
 const localePath = useLocalePath()
 
-const fallbackTitle = computed(() => {
-  const slugs = route.params.slug || route.params.brandName || route.params.productName
-  if (Array.isArray(slugs)) return slugs[slugs.length - 1]
-  return slugs || ''
+const crumbs = computed(() => {
+  if (props.items?.length) {
+    return props.items
+  }
+
+  const fallback = [{ text: t('main'), path: localePath('/') }]
+  if (props.title) {
+    fallback.push({ text: props.title, path: null })
+  }
+  return fallback
 })
-
-const { data: fetchedBreadcrumbs } = props.items
-  ? { data: ref([]) }
-  : useAsyncData(
-      `breadcrumbs:${props.type}:${props.url}:${locale.value}`,
-      async () => {
-        if (!props.type || !props.url) {
-          return []
-        }
-
-        const response = await $fetch('/api/seo/get_breadcrumbs', {
-          method: 'POST',
-          body: {
-            url: props.url,
-            type: props.type,
-            lang: locale.value,
-          },
-        })
-
-        return response?.breadcrumbs || []
-      },
-      {
-        default: () => [],
-      }
-    )
-
-const breadcrumbs = computed(() => props.items || fetchedBreadcrumbs.value || [])
 </script>
 
 <style lang="scss">

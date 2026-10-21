@@ -8,26 +8,30 @@
     <NuxtLink
       :to="product.path"
       class="c-product__img"
+      @click="emit('select', product)"
     >
       <picture>
         <source
-          :srcset="product.post_img_l"
+          v-if="cardImage.desktop"
+          :srcset="cardImage.desktop"
           media="(min-width: 426px)"
         />
         <source
-          :srcset="product.post_img_m"
+          v-if="cardImage.mobile"
+          :srcset="cardImage.mobile"
           media="(max-width: 425px)"
         />
         <img
-          src="data:image/gif;base64,R0lGODlhBAAFAIAAAP///wAAACH5BAEAAAEALAAAAAAEAAUAAAIEjI+ZBQA7"
-          :alt="product.name"
+          :src="cardImage.src"
+          :alt="cardImage.alt"
           :title="product.name"
-          width="342"
-          height="435"
-          class="lazy entered loaded"
+          :width="cardImage.width"
+          :height="cardImage.height"
+          :loading="eager ? 'eager' : 'lazy'"
+          decoding="async"
         />
         <span v-if="product.percent" class="c-product__sale">-{{ product.percent }}%</span>
-        <span v-if="product.stockStatus === 'outofstock'" class="c-product__stock">{{ te('out_of_stock') ? t('out_of_stock') : 'Out of stock' }}</span>
+        <span v-if="product.stockStatus === 'outofstock'" class="c-product__stock">{{ t('out_of_stock') }}</span>
       </picture>
     </NuxtLink>
 
@@ -46,12 +50,31 @@
 </template>
 
 <script setup>
-defineProps({
+const props = defineProps({
   product: { type: Object, required: true },
   isBrand: { type: Boolean, default: false },
+  // Первые карточки в видимой области грузятся сразу (LCP архива)
+  eager: { type: Boolean, default: false },
 })
 
-const { t, te } = useI18n()
+const emit = defineEmits(['select'])
+const { t } = useI18n()
+
+// archive_xl (532×665) для экранов шире 425px, archive_md (420×504) для узких — как в теме WP
+const cardImage = computed(() => {
+  const image = props.product.image
+  const desktop = image?.sizes?.archive_xl
+  const mobile = image?.sizes?.archive_md
+
+  return {
+    desktop: desktop?.src || props.product.post_img_l || '',
+    mobile: mobile?.src || props.product.post_img_m || '',
+    src: desktop?.src || props.product.post_img_l || image?.src || '',
+    alt: image?.alt || props.product.name,
+    width: desktop?.width || 532,
+    height: desktop?.height || 665,
+  }
+})
 </script>
 
 <style lang="scss">

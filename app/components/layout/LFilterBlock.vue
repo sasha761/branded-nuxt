@@ -14,8 +14,8 @@
 
     <div class="l-shop__result">
       <div class="l-shop__result-count">
-        <p v-if="props.products.length" class="woocommerce-result-count">
-          Отображение {{ productCurrentCount }} из {{ productsLength }}
+        <p v-if="products.length" class="woocommerce-result-count">
+          {{ t('result_count', { from: rangeFrom, to: rangeTo, total: productsCount }) }}
         </p>
       </div>
 
@@ -25,7 +25,7 @@
           class="u-btn is-grey-border is-border-radius is-small"
           @click="openMobileFilters"
         >
-          {{ te('all_filters') ? t('all_filters') : 'All filters' }}
+          {{ t('all_filters') }}
         </button>
       </div>
 
@@ -34,9 +34,9 @@
         @select-filter="sortHandler"
         :options="sortOptions"
         :show-all="showAll"
-        placeholder="Сортировать по"
+        :placeholder="t('sort_by')"
         filter-param="orderby"
-        :current-option="getFilterByKey('orderby', route.query.orderby)"
+        :current-option="getSortOption(route.query.orderby)"
       />
     </div>
   </div>
@@ -44,33 +44,34 @@
 
 <script setup>
 const props = defineProps({
+  // Слаг и таксономия архива: фильтры считаются по его товарам
   slug: { type: String, default: '' },
+  taxonomy: { type: String, default: '' },
   products: { type: Array, default: () => [] },
   productsCount: { type: Number, default: 0 },
-  is_brand: { type: Boolean, default: false },
+  page: { type: Number, default: 1 },
+  perPage: { type: Number, default: 16 },
 })
 
 const route = useRoute()
-const { locale, t, te } = useI18n()
+const { locale, t } = useI18n()
 const { open } = usePopup()
 
 const emit = defineEmits(['filtering'])
 
 const showAll = computed(() => ({
-  text: te('showAll') ? t('showAll') : 'Show all',
+  text: t('showAll'),
   key: 'all',
 }))
 
-const currentPage = computed(() => Number(route.query?.page) || 1)
-const productsLength = computed(() => props.productsCount)
-
 const { data: filtersData, status } = useLazyAsyncData(
-  `filters:${props.slug}:${locale.value}:${currentPage.value}`,
+  `filters:${props.taxonomy}:${props.slug}:${locale.value}`,
   () => $fetch('/api/archive/get_filters', {
     params: {
       lang: locale.value,
-      slug: props.slug,
-      is_brand: props.is_brand,
+      slug: props.slug || undefined,
+      // product_cat — по умолчанию в WP
+      taxonomy: props.taxonomy && props.taxonomy !== 'product_cat' ? props.taxonomy : undefined,
     },
   }),
   {
@@ -99,15 +100,11 @@ const sortOptions = computed(() => {
     .map((option) => ({ text: option.label, key: option.value }))
 })
 
-const productCurrentCount = computed(() => {
-  const maxItems = props.products.length ? 16 : 0
-  const first = props.products.length ? 1 : 0
-  return `${maxItems * currentPage.value - (maxItems - first)}-${maxItems * currentPage.value - (maxItems - props.products.length)}`
-})
+const rangeFrom = computed(() => (props.page - 1) * props.perPage + 1)
+const rangeTo = computed(() => (props.page - 1) * props.perPage + props.products.length)
 
-function getFilterByKey(filterKey, searchParam) {
-  const options = sortOptions.value
-  return options.find((option) => option.key === searchParam) || showAll.value
+function getSortOption(searchParam) {
+  return sortOptions.value.find((option) => option.key === searchParam) || showAll.value
 }
 
 function sortHandler(selectedOption) {
@@ -116,7 +113,7 @@ function sortHandler(selectedOption) {
 
 function openMobileFilters() {
   open('PopupFilter', {
-    title: te('all_filters') ? t('all_filters') : 'All filters',
+    title: t('all_filters'),
     filterGroups: filterGroups.value,
     showAll: showAll.value,
     onSelect: sortHandler,

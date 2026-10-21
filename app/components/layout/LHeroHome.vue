@@ -16,13 +16,14 @@
                     :src="item.img"
                     width="1400"
                     height="616"
-                    :alt="'Branded баннер ' + index"
+                    :alt="$t('home.banner_alt', { n: index + 1 })"
                     :fetchpriority="index === 0 ? 'high' : 'low'"
                     :loading="index === 0 ? 'eager' : 'lazy'"
                   >
                 </picture>
+                <!-- Как в теме WP: H1 в последнем слайде, текст на языке страницы -->
                 <h1 v-if="index === data.banners.length - 1" class="c-banner__title">
-                  Online store brand clothing for men and women
+                  {{ $t('home_title') }}
                 </h1>
               </NuxtLink>
             </div>
@@ -31,23 +32,24 @@
 
         <div class="col-lg-3 col-md-12 u-col">
           <div class="l-hero__row-banners">
-            <NuxtLink :to="localePath('/product/steganaya-kurtka-zhenskaya-sinyaya-ot-beom/')" class="c-banner">
+            <!-- Раньше вели на удалённые товары BeOm (404 и на живом сайте) -->
+            <NuxtLink :to="siteLink('brandBeom')" class="c-banner">
               <picture>
                 <img
                   :src="data.small_banner_1"
                   width="360"
                   height="234"
-                  alt="Куртка женская синяя от BeOm"
+                  :alt="$t('home.small_banner_1_alt')"
                 >
               </picture>
             </NuxtLink>
-            <NuxtLink :to="localePath('/product/svitshot-zhenskij-s-printami-gorodov-ukrainy-bezhevyj-ot-beom/')" class="c-banner">
+            <NuxtLink :to="siteLink('brandBeom')" class="c-banner">
               <picture>
                 <img
                   :src="data.small_banner_2"
                   width="360"
                   height="234"
-                  alt="Свитшот женский с принтами городов Украины"
+                  :alt="$t('home.small_banner_2_alt')"
                 >
               </picture>
             </NuxtLink>
@@ -65,7 +67,7 @@ const props = defineProps({
   data: { type: Object },
 })
 
-const localePath = useLocalePath()
+const siteLink = useSiteLink()
 const bannerSlider = ref(null)
 
 const firstBannerImg = computed(() => props.data?.banners?.[0]?.img)
