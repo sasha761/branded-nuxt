@@ -116,6 +116,11 @@ function createActiveNavigation(to: RouteLocationNormalized, from: RouteLocation
 }
 
 export default defineNuxtPlugin((nuxtApp) => {
+  // Только для разработки: в прод-сборке код плагина вырезается
+  if (!import.meta.dev) {
+    return
+  }
+
   const state = hydratePerfMonitorState()
   const perfParam = new URLSearchParams(window.location.search).get(PERF_MONITOR_QUERY_PARAM)
 

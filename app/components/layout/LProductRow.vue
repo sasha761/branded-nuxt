@@ -8,7 +8,7 @@
       height="990"
     >
     <div class="u-container">
-      <h2 class="u-h2">Best offers</h2>
+      <h2 class="u-h2">{{ $t('home.best_offers') }}</h2>
       <div ref="productRow" class="row js-product-row swiper">
         <div class="swiper-wrapper">
           <div v-for="product in data" :key="product.id" class="col-lg-3 col-md-4 col-6 u-col swiper-slide">

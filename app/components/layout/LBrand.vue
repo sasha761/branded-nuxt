@@ -6,8 +6,8 @@
       <div class="l-brand__content js-slider-container">
         <div class="l-brand__head">
           <div class="l-brand__title">
-            <NuxtLink :to="localePath('/brand/wearme/')" class="u-btn is-black">The entire collection</NuxtLink>
-            <h2 class="u-h2">Bodies and kits</h2>
+            <NuxtLink :to="siteLink('brandWearme')" class="u-btn is-black">{{ $t('home.all_collection') }}</NuxtLink>
+            <h2 class="u-h2">{{ $t('home.bodies_title') }}</h2>
             <p>Ukrainian Underwear Essentials est. MMXX</p>
           </div>
           <div class="l-brand__arrow">
@@ -51,7 +51,7 @@ const props = defineProps({
   data: { type: Array },
 })
 
-const localePath = useLocalePath()
+const siteLink = useSiteLink()
 const productRowSlider = ref(null)
 let swiperInstance = null
 

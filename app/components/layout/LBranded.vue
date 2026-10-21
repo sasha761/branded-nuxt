@@ -12,16 +12,15 @@
                   <use xlink:href="#logo"></use>
                 </svg>
               </NuxtLink>
-              <p>The territory of your style and comfort</p>
+              <p>{{ $t('home.branded_slogan') }}</p>
             </div>
-            <p>Мы объединяем восходящие модные бренды. Наша площадка гарантирует покупателям качество товара и сроки доставки, а производителям - великолепное представление своего ассортимента. Пальто, юбки, платья, пиджаки, джинсы и обувь. Все самое трендовое на одной торговой площадке.</p>
-            <p>Ми об'єднуємо висхідні модні бренди. Наш майданчик гарантує покупцям якість товару та терміни доставки, а виробникам – чудове представлення свого асортименту. Пальто, спідниці, сукні, піджаки, джинси та взуття. Все трендове на одному торговому майданчику.</p>
+            <p>{{ $t('home.branded_text') }}</p>
           </div>
           <div class="c-appeal">
             <span class="is-number">15</span>
-            <p class="u-h3">brands</p>
-            <p class="u-h4">already in our community</p>
-            <a href="#" class="u-btn is-orange">sign up</a>
+            <p class="u-h3">{{ $t('home.brands') }}</p>
+            <p class="u-h4">{{ $t('home.brands_community') }}</p>
+            <a href="#" class="u-btn is-orange">{{ $t('home.join') }}</a>
           </div>
         </div>
         <div class="l-branded__products d-none d-sm-block">

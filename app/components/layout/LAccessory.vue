@@ -2,9 +2,9 @@
   <section class="l-accessory d-none d-lg-block">
     <div class="u-container u-relative">
       <div class="l-accessory__text">
-        <h2 class="u-h2">Accessories</h2>
-        <p>Jewelry, bags, backpacks, glasses and more</p>
-        <NuxtLink :to="localePath('/product-category/accessories/')" class="u-btn is-black">The entire collection</NuxtLink>
+        <h2 class="u-h2">{{ $t('home.accessories_title') }}</h2>
+        <p>{{ $t('home.accessories_text') }}</p>
+        <NuxtLink :to="siteLink('accessories')" class="u-btn is-black">{{ $t('home.all_collection') }}</NuxtLink>
       </div>
 
       <div class="text-center">
@@ -15,7 +15,7 @@
             height="830"
             width="825"
           >
-          <NuxtLink :to="localePath('/product-category/accessories/')" class="c-circle">
+          <NuxtLink :to="siteLink('accessories')" class="c-circle">
             <svg width="61px" height="19px" class="c-circle__arrow">
               <use xlink:href="#small-arrow"></use>
             </svg>
@@ -45,7 +45,7 @@
         <picture style="padding: 12px; background-color: white;">
           <img
             :src="item.img"
-            :alt="'Аксессуары: сумочки -' + index"
+            :alt="item.title || $t('home.accessories_alt')"
             height="300"
             :width="index === 0 ? 300 : (index === 1 ? 330 : 300)"
           >
@@ -60,7 +60,7 @@ const props = defineProps({
   data: { type: Array },
 })
 
-const localePath = useLocalePath()
+const siteLink = useSiteLink()
 </script>
 
 <style lang="scss" scoped>

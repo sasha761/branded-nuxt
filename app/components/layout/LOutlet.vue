@@ -9,19 +9,19 @@
         <div class="l-outlet__content-left">
           <div class="row">
             <div class="col-lg-6">
-              <NuxtLink :to="localePath('/product-category/accessories/')" class="c-outlet">
+              <NuxtLink :to="siteLink('accessories')" class="c-outlet">
                 <img src="~/assets/img/bags1.jpg" alt="bags branded" width="400" height="400">
               </NuxtLink>
             </div>
             <div class="col-lg-6">
-              <NuxtLink :to="localePath('/product-category/accessories/')" class="c-outlet">
+              <NuxtLink :to="siteLink('accessories')" class="c-outlet">
                 <img src="~/assets/img/bags2.jpg" alt="bags branded" width="400" height="400">
               </NuxtLink>
             </div>
           </div>
           <div class="d-flex align-items-center justify-content-between is-title">
             <p class="u-text">VeroS bags and accessories</p>
-            <NuxtLink :to="localePath('/product-category/accessories/')" class="u-btn is-black">The entire collection</NuxtLink>
+            <NuxtLink :to="siteLink('accessories')" class="u-btn is-black">{{ $t('home.all_collection') }}</NuxtLink>
           </div>
         </div>
         <div class="l-outlet__content-right js-slider-container">
@@ -74,7 +74,7 @@ const props = defineProps({
   data: { type: Array },
 })
 
-const localePath = useLocalePath()
+const siteLink = useSiteLink()
 const outletSlider = ref(null)
 let swiperInstance = null
 
