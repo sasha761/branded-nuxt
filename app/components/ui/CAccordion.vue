@@ -1,22 +1,28 @@
 <template>
   <div class="c-accordion">
     <div
-      v-for="(item, index) in accordionItems"
-      :key="index"
+      v-for="(item, index) in items"
+      :key="item.key"
       class="c-accordion__block"
-      :class="{ 'is-active': item.active }"
+      :class="{ 'is-active': activeIndex === index }"
     >
       <div @click="toggleAccordion(index)" class="c-accordion__block-title">
-        <span>{{ te(item.title) ? t(item.title) : item.title }}</span>
+        <span>{{ item.title }}</span>
         <svg width="11px" height="7px" class="u-arrow">
           <use xlink:href="#arrow"></use>
         </svg>
       </div>
-      <div
-        class="c-accordion__block-text"
-        ref="accordionItemText"
-        v-html="item.content"
-      ></div>
+      <!-- Текст в SSR-HTML (виден роботам), раскрывается по клику -->
+      <div class="c-accordion__block-text" ref="accordionItemText">
+        <template v-if="item.rows">
+          <p v-for="row in item.rows" :key="row.label">
+            <b>{{ row.label }}:</b>
+            <NuxtLink v-if="row.path" :to="row.path">{{ row.value }}</NuxtLink>
+            <template v-else>{{ row.value }}</template>
+          </p>
+        </template>
+        <div v-else v-html="item.html"></div>
+      </div>
     </div>
   </div>
 </template>
@@ -24,46 +30,26 @@
 <script setup>
 import { slideUp, slideDown } from '~/utils/slideToggle'
 
-const { t, te } = useI18n()
-
-const props = defineProps({
-  accordionInfo: { type: Object, required: true },
+defineProps({
+  // [{ key, title, html } | { key, title, rows: [{ label, value, path? }] }]
+  items: { type: Array, required: true },
 })
 
 const accordionItemText = ref([])
-const accordionItems = ref([])
-
-onMounted(() => {
-  for (const [key, value] of Object.entries(props.accordionInfo)) {
-    accordionItems.value.push({
-      title: key,
-      content: value,
-      active: false,
-    })
-  }
-})
+const activeIndex = ref(-1)
 
 function toggleAccordion(index) {
-  if (accordionItems.value[index].active) {
-    accordionItems.value[index].active = false
+  if (activeIndex.value === index) {
+    activeIndex.value = -1
     slideUp(accordionItemText.value[index])
-  } else {
-    closeAll()
-    openItem(index)
+    return
   }
-}
 
-function closeAll() {
-  accordionItems.value.forEach((block, i) => {
-    if (block.active) {
-      block.active = false
-      slideUp(accordionItemText.value[i])
-    }
-  })
-}
+  if (activeIndex.value !== -1) {
+    slideUp(accordionItemText.value[activeIndex.value])
+  }
 
-function openItem(index) {
-  accordionItems.value[index].active = true
+  activeIndex.value = index
   slideDown(accordionItemText.value[index])
 }
 </script>

@@ -4,157 +4,71 @@
     <div class="u-container">
       <div class="row">
         <div class="col-lg-6">
-          <form @submit.prevent="submitForm" method="post" class="l-checkout">
+          <form @submit.prevent="submitForm" method="post" class="l-checkout" novalidate>
             <div class="l-checkout__form">
-              <h1 class="u-h3">Оформление заказа</h1>
-              <div class="c-input">
-                <span>Имя</span>
+              <h1 class="u-h3">{{ t('checkout.title') }}</h1>
+
+              <div v-for="field in fields" :key="field.name" class="c-input">
+                <span>{{ field.label }}</span>
                 <input
-                  type="text"
-                  v-model.trim="v$.formData.firstName.$model"
-                  :class="{ invalid: v$.formData.firstName.$error }"
-                  name="billing_first_name"
-                  maxlength="20"
+                  :type="field.type"
+                  v-model.trim="v$.formData[field.name].$model"
+                  :class="{ invalid: fieldError(field.name) }"
+                  :name="field.htmlName"
+                  :placeholder="field.placeholder"
+                  :autocomplete="field.autocomplete"
+                  :inputmode="field.inputmode"
+                  :maxlength="field.maxlength"
                 />
-                <div class="error-msg" v-if="v$.formData.firstName.required.$invalid && v$.formData.firstName.$error">
-                  Поле не должно быть пустым
-                </div>
-                <div class="error-msg" v-if="v$.formData.firstName.minLength.$invalid">
-                  Минимальная длина 2 символа
-                </div>
+                <div class="error-msg" v-if="fieldError(field.name)">{{ fieldError(field.name) }}</div>
               </div>
+
               <div class="c-input">
-                <span>Фамилия</span>
-                <input
-                  type="text"
-                  v-model.trim="v$.formData.lastName.$model"
-                  :class="{ invalid: v$.formData.lastName.$error }"
-                  name="billing_last_name"
-                  maxlength="20"
-                />
-                <div class="error-msg" v-if="v$.formData.lastName.required.$invalid && v$.formData.lastName.$error">
-                  Поле не должно быть пустым
-                </div>
-                <div class="error-msg" v-if="v$.formData.lastName.minLength.$invalid">
-                  Минимальная длина 2 символа
-                </div>
-              </div>
-              <div class="c-input">
-                <span>Отделение почты</span>
-                <input
-                  type="text"
-                  v-model.trim="v$.formData.address.$model"
-                  :class="{ invalid: v$.formData.address.$error }"
-                  name="billing_address_1"
-                />
-                <div class="error-msg" v-if="v$.formData.address.required.$invalid && v$.formData.address.$error">
-                  Поле не должно быть пустым
-                </div>
-              </div>
-              <div class="c-input">
-                <span>Населенный пункт</span>
-                <input
-                  type="text"
-                  v-model.trim="v$.formData.city.$model"
-                  :class="{ invalid: v$.formData.city.$error }"
-                  name="billing_city"
-                  maxlength="20"
-                />
-                <div class="error-msg" v-if="v$.formData.city.required.$invalid && v$.formData.city.$error">
-                  Поле не должно быть пустым
-                </div>
-                <div class="error-msg" v-if="v$.formData.city.minLength.$invalid">
-                  Минимальная длина 3 символа
-                </div>
-              </div>
-              <div class="c-input">
-                <span>Телефон</span>
-                <input
-                  type="tel"
-                  v-model="v$.formData.phone.$model"
-                  :class="{ invalid: v$.formData.phone.$error }"
-                  name="billing_phone"
-                  placeholder="+380XXXXXXXXX"
-                  inputmode="tel"
-                  maxlength="13"
-                />
-                <div class="error-msg" v-if="v$.formData.phone.required.$invalid && v$.formData.phone.$error">
-                  Поле не должно быть пустым
-                </div>
-                <div
-                  class="error-msg"
-                  v-if="v$.formData.phone.phoneFormat.$invalid && !v$.formData.phone.required.$invalid && v$.formData.phone.$error"
-                >
-                  Введите номер в формате +380XXXXXXXXX
-                </div>
-              </div>
-              <div class="c-input">
-                <span>Email</span>
-                <input
-                  type="email"
-                  v-model.trim="v$.formData.email.$model"
-                  :class="{ invalid: v$.formData.email.$error }"
-                  name="billing_email"
-                />
-                <div class="error-msg" v-if="v$.formData.email.required.$invalid && v$.formData.email.$error">
-                  Поле не должно быть пустым
-                </div>
-                <div class="error-msg" v-if="v$.formData.email.email.$invalid">
-                  Неверный формат почты
-                </div>
-              </div>
-              <div class="c-input">
-                <span>Примечание к заказу</span>
+                <span>{{ t('checkout.comment') }}</span>
                 <textarea
                   v-model.trim="formData.comments"
                   name="order_comments"
                   rows="4"
-                  placeholder="Примечания к вашему заказу, например, особые пожелания отделу доставки."
+                  maxlength="2000"
+                  :placeholder="t('checkout.comment_placeholder')"
                 ></textarea>
               </div>
 
+              <input v-model="formData.website" class="u-honeypot" type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
+
               <div id="payment" class="woocommerce-checkout-payment">
                 <ul class="wc_payment_methods payment_methods methods">
-                  <li class="wc_payment_method payment_method_bacs">
+                  <li
+                    v-for="method in paymentMethods"
+                    :key="method.id"
+                    class="wc_payment_method"
+                    :class="`payment_method_${method.id}`"
+                  >
                     <input
-                      id="payment_method_bacs"
+                      :id="`payment_method_${method.id}`"
+                      v-model="paymentMethod"
                       type="radio"
                       class="input-radio"
                       name="payment_method"
-                      value="bacs"
-                      checked="checked"
+                      :value="method.id"
                     />
-                    <label for="payment_method_bacs">Прямой банковский перевод</label>
-                    <div class="payment_box payment_method_bacs">
-                      <p>
-                        Оплату нужно направлять напрямую на наш банковский счет.
-                        Используйте идентификатор заказа в качестве кода
-                        платежа. Заказ будет отправлен после поступления средств
-                        на наш счет.
-                      </p>
-                    </div>
-                  </li>
-                  <li class="wc_payment_method payment_method_cod">
-                    <input
-                      id="payment_method_cod"
-                      type="radio"
-                      class="input-radio"
-                      name="payment_method"
-                      value="cod"
-                    />
-                    <label for="payment_method_cod">Оплата при доставке</label>
-                    <div class="payment_box payment_method_cod" style="display: none">
-                      <p>Оплата наличными при доставке заказа.</p>
+                    <label :for="`payment_method_${method.id}`">{{ method.title }}</label>
+                    <div v-show="paymentMethod === method.id" class="payment_box" :class="`payment_method_${method.id}`">
+                      <p>{{ method.description }}</p>
                     </div>
                   </li>
                 </ul>
+
+                <p v-if="formError" class="c-form-error">{{ formError }}</p>
+                <p v-else-if="hasItemErrors" class="c-form-error">{{ t('checkout.fix_cart') }}</p>
+
                 <div class="form-row place-order">
                   <button
                     type="submit"
                     class="button alt"
-                    :disabled="requestInProgress"
+                    :disabled="requestInProgress || !cartStore.cartProducts.length || hasItemErrors"
                   >
-                    Подтвердить заказ
+                    {{ t('checkout.submit') }}
                   </button>
                 </div>
               </div>
@@ -162,17 +76,25 @@
           </form>
         </div>
         <div class="col-lg-6">
-          <LayoutLCart
-            :show-empty="true"
-            heading-tag="h2"
-          />
+          <ClientOnly>
+            <LayoutLCart
+              :show-empty="true"
+              heading-tag="h2"
+              :quote="quote"
+            />
 
-          <LayoutLSidebarCart
-            v-model:coupon-code="couponCode"
-            coupon-input-id="checkout_coupon_code"
-            :summary-items="summaryItems"
-            @submit-coupon="submitCoupon"
-          />
+            <LayoutLSidebarCart
+              v-if="cartStore.cartProducts.length"
+              v-model:coupon-code="couponInput"
+              coupon-input-id="checkout_coupon_code"
+              :applied-coupon="appliedCoupon"
+              :coupon-error="couponError"
+              :coupon-disabled="quoteStatus === 'pending'"
+              :summary-items="summaryItems"
+              @submit-coupon="submitCoupon"
+              @remove-coupon="clearCoupon"
+            />
+          </ClientOnly>
         </div>
       </div>
     </div>
@@ -180,109 +102,55 @@
 </template>
 
 <script setup>
-import { useVuelidate } from '@vuelidate/core'
-import { required, email, minLength, helpers } from '@vuelidate/validators'
-
 const localePath = useLocalePath()
 const router = useRouter()
 const { t } = useI18n()
 const cartStore = useCartStore()
-const { requestInProgress, waitRequest } = useWaitRequest()
 
-const cartProducts = computed(() => cartStore.cartProducts)
-const couponCode = ref('')
+useServicePageHead(() => t('checkout.title'))
 
-const formData = reactive({
-  firstName: '',
-  lastName: '',
-  phone: '',
-  email: '',
-  city: '',
-  address: '',
-  comments: '',
-})
+const {
+  quote,
+  quoteStatus,
+  hasItemErrors,
+  couponInput,
+  couponError,
+  appliedCoupon,
+  submitCoupon,
+  clearCoupon,
+  summaryItems,
+} = useCartSummary()
 
-const rules = {
-  formData: {
-    firstName: { required, minLength: minLength(2) },
-    lastName: { required, minLength: minLength(2) },
-    email: { required, email },
-    phone: {
-      required,
-      phoneFormat: helpers.regex(/^\+380\d{9}$/),
-    },
-    city: { required, minLength: minLength(3) },
-    address: { required, minLength: minLength(1) },
-  },
-}
+const { formData, v$, fieldError, formError, submit, requestInProgress } = useOrderForm(() => cartStore.cartProducts)
 
-const v$ = useVuelidate(rules, { formData })
-
-watch(() => formData.phone, (value) => {
-  const digits = value.replace(/\D/g, '')
-  const hasPlus = value.startsWith('+')
-  let normalized = digits
-
-  if (hasPlus) {
-    normalized = `+${digits}`
-  }
-
-  if (normalized.length > 13) {
-    normalized = normalized.slice(0, 13)
-  }
-
-  if (normalized !== value) {
-    formData.phone = normalized
-  }
-})
-
-const summaryItems = computed(() => [
-  {
-    label: 'Сумма заказа',
-    value: `${cartStore.totalAmount} ${t('currency')}`,
-    valueClass: 'c-price',
-  },
-  {
-    label: 'Доставка',
-    value: `0 ${t('currency')}`,
-  },
-  {
-    label: 'Всего',
-    value: `${cartStore.totalAmount} ${t('currency')}`,
-  },
+// Способы оплаты WooCommerce, которые принимает create_order
+const paymentMethod = ref('bacs')
+const paymentMethods = computed(() => [
+  { id: 'bacs', title: t('payment.bacs'), description: t('payment.bacs_description') },
+  { id: 'cod', title: t('payment.cod'), description: t('payment.cod_description') },
 ])
 
-function submitCoupon() {}
+const fields = computed(() => [
+  { name: 'firstName', htmlName: 'billing_first_name', label: t('form_fields.first_name'), type: 'text', autocomplete: 'given-name', maxlength: 50 },
+  { name: 'lastName', htmlName: 'billing_last_name', label: t('form_fields.last_name'), type: 'text', autocomplete: 'family-name', maxlength: 50 },
+  { name: 'address', htmlName: 'billing_address_1', label: t('form_fields.address'), type: 'text', maxlength: 200 },
+  { name: 'city', htmlName: 'billing_city', label: t('form_fields.city'), type: 'text', autocomplete: 'address-level2', maxlength: 100 },
+  // без maxlength: вставленный «+38 (050) 123-45-67» браузер обрезал бы до нормализации, длину ограничивает normalizePhone
+  { name: 'phone', htmlName: 'billing_phone', label: t('form_fields.phone'), type: 'tel', placeholder: '+380XXXXXXXXX', autocomplete: 'tel', inputmode: 'tel' },
+  { name: 'email', htmlName: 'billing_email', label: 'Email', type: 'email', autocomplete: 'email', maxlength: 200 },
+])
 
 async function submitForm() {
-  const isValid = await v$.value.$validate()
-  if (!isValid) return
-
-  waitRequest(async () => {
-    try {
-      const result = await $fetch('/api/cart/create_order', {
-        method: 'POST',
-        body: {
-          products: cartProducts.value,
-          firstName: formData.firstName,
-          lastName: formData.lastName,
-          phone: formData.phone,
-          email: formData.email,
-          city: formData.city,
-          address: formData.address,
-          comments: formData.comments,
-        },
-      })
-
-      const url = new URL(result)
-      const path = url.pathname + url.search
-      const numbers = path.match(/order-received\/(\d+)\//)?.[1]
-
-      router.push(localePath(`/order-received/${numbers}`))
-    } catch (error) {
-      console.error(error)
-    }
+  const order = await submit({
+    payment_method: paymentMethod.value,
+    // только купон, который WP уже принял в котировке
+    coupon: appliedCoupon.value || undefined,
   })
+
+  if (!order) return
+
+  cartStore.clear()
+  await router.push(localePath({ path: `/order-received/${order.id}/`, query: { key: order.key } }))
 }
 </script>
 

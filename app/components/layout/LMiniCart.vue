@@ -1,25 +1,25 @@
 <template>
   <div class="l-mini-cart">
-    <p class="u-h3" v-if="cartTitle">Корзина</p>
-    <span class="l-mini-cart__count" v-if="cartProducts.length">{{ cartProducts.length }} товар</span>
+    <p class="u-h3" v-if="cartTitle">{{ t('cart') }}</p>
+    <span class="l-mini-cart__count" v-if="cartProducts.length">{{ t('items_count', { count: cartProducts.length }) }}</span>
     <div v-if="cartProducts.length">
       <ul class="l-mini-cart__list">
         <li v-for="(product, index) in cartProducts" :key="index" class="l-mini-cart__item">
-          <UiCMiniCartItem :product="product" v-if="(index == 0) || product.size_selected[0].id != cartProducts[index-1].size_selected[0].id" />
+          <UiCMiniCartItem :product="product" />
         </li>
       </ul>
       <div v-if="totalAmount" class="l-mini-cart__total">
-        <span>Сумма заказа</span>
-        <span class="is-bold">{{ totalAmount }} грн</span>
+        <span>{{ t('cart_summary.subtotal') }}</span>
+        <span class="is-bold">{{ totalAmount }} {{ t('currency') }}</span>
       </div>
 
       <div class="l-mini-cart__btn" v-if="cartButtons">
-        <NuxtLink :to="localePath('/checkout')" class="u-btn is-black">Оформление заказа</NuxtLink>
-        <NuxtLink :to="localePath('/cart')" class="is-cart">В корзину</NuxtLink>
+        <NuxtLink :to="localePath('/checkout/')" class="u-btn is-black">{{ t('checkout.title') }}</NuxtLink>
+        <NuxtLink :to="localePath('/cart/')" class="is-cart">{{ t('to_cart') }}</NuxtLink>
       </div>
     </div>
     <div v-else>
-      <p>Корзина пуста</p>
+      <p>{{ t('cart_empty') }}</p>
     </div>
   </div>
 </template>
@@ -32,6 +32,7 @@ defineProps({
   totalAmount: { type: Number },
 })
 
+const { t } = useI18n()
 const localePath = useLocalePath()
 </script>
 

@@ -1,31 +1,40 @@
 <template>
   <main class="p-thank">
-    <UiCPageLoader v-if="status !== 'success'"/> 
+    <UiCPageLoader v-if="status === 'pending' || status === 'idle'"/>
     <div class="u-container">
-      <div class="row">
+      <div v-if="status === 'error'" class="row">
         <div class="col-lg-6">
           <div class="l-checkout__form">
-            <h1 class="u-h3">Спасибо. Ваш заказ принят</h1>
+            <h1 class="u-h3">{{ t('order.not_found') }}</h1>
+            <p>{{ t('order.not_found_text') }}</p>
+          </div>
+        </div>
+      </div>
+
+      <div v-else-if="orderData.order_number" class="row">
+        <div class="col-lg-6">
+          <div class="l-checkout__form" :transaction-id="orderData.order_number">
+            <h1 class="u-h3">{{ t('order.thanks') }}</h1>
             <ul class="p-thank__list">
-              <li>Номер заказа: <b>{{ orderData.order_number }}</b></li>
-              <li>Дата: <b>{{ orderData.order_date }}</b></li>
+              <li>{{ t('order.number') }}: <b>{{ orderData.order_number }}</b></li>
+              <li>{{ t('order.date') }}: <b>{{ orderData.order_date }}</b></li>
               <li>Email: <b>{{ orderData.billing_email }}</b></li>
-              <li>Город: <b>{{ orderData.billing_city }}</b></li>
-              <li>Отделение почты: <b>{{ orderData.billing_address_1 }}</b></li>
-              <li>Способ оплаты: <b>{{ orderData.payment_method_title }}</b></li>
-              <li>ФИО: <b>{{ orderData.billing_first_name }} {{ orderData.billing_last_name }}</b></li>
-              <li>Телефон: <b>{{ orderData.billing_phone }}</b></li>
+              <li>{{ t('form_fields.city') }}: <b>{{ orderData.billing_city }}</b></li>
+              <li>{{ t('form_fields.address') }}: <b>{{ orderData.billing_address_1 }}</b></li>
+              <li>{{ t('payment_method') }}: <b>{{ orderData.payment_method_title }}</b></li>
+              <li>{{ t('order.full_name') }}: <b>{{ orderData.billing_first_name }} {{ orderData.billing_last_name }}</b></li>
+              <li>{{ t('form_fields.phone') }}: <b>{{ orderData.billing_phone }}</b></li>
             </ul>
           </div>
         </div>
 
         <div class="col-lg-6">
           <div class="l-checkout__form">
-            <h2 class="u-h3">Информация о заказе</h2>
+            <h2 class="u-h3">{{ t('order.details') }}</h2>
             <ul class="p-thank__list">
               <li
-                v-for="product in products"
-                :key="product.variation_id"
+                v-for="(product, index) in products"
+                :key="`${product.id}-${product.variation_id}-${index}`"
                 class="p-thank__list-product js-order-item"
                 :data-name="product.name"
                 :data-id="product.id"
@@ -35,11 +44,18 @@
                 :data-categories="product.cats?.join(', ')"
               >
                 <p><b>{{ product.name }}</b></p>
-                <p>Количество: <b>{{ product.qty }}</b></p>
-                <p>Цена: <b>{{ product.total }} {{ orderData.order_currency }}</b></p>
+                <!-- Атрибуты, которых нет в названии позиции (цвет у вариации «любой цвет») -->
+                <p v-for="attribute in product.attributes || []" :key="attribute.label">
+                  {{ attribute.label }}: <b>{{ attribute.value }}</b>
+                </p>
+                <p>{{ t('quantity') }}: <b>{{ product.qty }}</b></p>
+                <p>{{ t('price') }}: <b>{{ product.total }} {{ orderData.order_currency }}</b></p>
+              </li>
+              <li v-if="Number(orderData.discount_total) > 0">
+                {{ t('cart_summary.discount') }}: <b>−{{ orderData.discount_total }} {{ orderData.order_currency }}</b>
               </li>
               <li :data-total="orderData.order_total">
-                Итого: <b>{{ orderData.order_total }} {{ orderData.order_currency }}</b>
+                {{ t('cart_summary.total') }}: <b>{{ orderData.order_total }} {{ orderData.order_currency }}</b>
               </li>
             </ul>
           </div>
@@ -51,16 +67,26 @@
 
 <script setup>
 const route = useRoute()
-const cartStore = useCartStore()
+const { locale, t } = useI18n()
+const analytics = useAnalytics()
 
 const orderId = computed(() => {
   const param = route.params.numbers
   return Array.isArray(param) ? param[0] : param
 })
+const orderKey = computed(() => {
+  const key = Array.isArray(route.query.key) ? route.query.key[0] : route.query.key
+  return typeof key === 'string' ? key : ''
+})
 
+useServicePageHead(() => t('order.thanks'))
+
+// Данные заказа только по ключу из ответа create_order (без него WP отвечает 404).
 const { status, data: orderInfo } = useFetch('/api/cart/get_order_info', {
   params: {
     order_id: orderId,
+    key: orderKey,
+    lang: locale,
   },
   key: () => `order-info-${orderId.value}`,
   lazy: true,
@@ -71,13 +97,22 @@ const { status, data: orderInfo } = useFetch('/api/cart/get_order_info', {
   }),
 })
 
-const orderData = computed(() => orderInfo.value.order_data)
-const products = computed(() => orderInfo.value.products)
+const orderData = computed(() => orderInfo.value?.order_data || {})
+const products = computed(() => orderInfo.value?.products || [])
 
-watch(orderInfo, (value) => {
-  if (value?.order_data?.order_number) {
-    cartStore.setProductToCart([])
+// purchase — один раз на заказ, даже если страницу обновили
+watch(orderData, (order) => {
+  if (!order?.order_number) return
+
+  const sentKey = `purchase-sent-${order.order_id || order.order_number}`
+  try {
+    if (sessionStorage.getItem(sentKey)) return
+    sessionStorage.setItem(sentKey, '1')
+  } catch {
+    // без sessionStorage событие может уйти повторно — не критично
   }
+
+  analytics.purchase(order, products.value)
 }, { immediate: true })
 </script>
 

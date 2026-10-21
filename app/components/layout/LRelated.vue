@@ -1,7 +1,7 @@
 <template>
   <section class="l-related js-slider-container">
     <div class="u-container">
-      <h2 class="u-h2">Похожие товары</h2>
+      <h2 class="u-h2">{{ $t('related_products') }}</h2>
       <div class="c-arrow is-big">
         <div @click="slidePrev" class="c-arrow__prev js-prev">
           <svg width="22px" height="13px" class="c-arrow__angle">

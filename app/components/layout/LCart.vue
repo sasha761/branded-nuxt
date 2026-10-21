@@ -6,7 +6,7 @@
 
     <div
       v-for="(product, index) in cartProducts"
-      :key="getProductKey(product, index)"
+      :key="getProductKey(product)"
       class="c-product-cart"
     >
       <NuxtLink
@@ -42,11 +42,25 @@
             {{ product.name }}
           </NuxtLink>
 
+          <template v-if="getAttributes(product, index).length">
+            <div
+              v-for="attribute in getAttributes(product, index)"
+              :key="attribute.label"
+              class="is-size mb-3"
+            >
+              {{ attribute.label }}: {{ attribute.value }}
+            </div>
+          </template>
+
           <div
-            v-if="getSelectedSizeName(product)"
+            v-else-if="getSelectedSizeName(product)"
             class="is-size mb-3"
           >
             {{ texts.sizeLabel }} {{ getSelectedSizeName(product) }}
+          </div>
+
+          <div v-if="itemError(index)" class="c-form-error mb-3">
+            {{ $t('order_errors.' + itemError(index)) }}
           </div>
 
           <div class="is-quantity mb-3">
@@ -61,6 +75,7 @@
                 >-</button>
                 <b>{{ product.quantity }}</b>
                 <button
+                  v-show="product.quantity < MAX_QUANTITY"
                   type="button"
                   class="u-btn is-plus"
                   @click="quantityPlus(product)"
@@ -70,7 +85,7 @@
           </div>
 
           <div class="d-block d-sm-none align-items-center">
-            <div class="c-price">{{ getProductTotal(product) }} {{ $t('currency') }}</div>
+            <div class="c-price">{{ getProductTotal(product, index) }} {{ $t('currency') }}</div>
             <div class="c-remove" @click="removeFromCart(product)">
               <svg width="20px" height="20px"><use xlink:href="#icon-close"></use></svg>
               <span>{{ texts.removeLabel }}</span>
@@ -79,7 +94,7 @@
         </div>
 
         <div class="d-none d-sm-block">
-          <div class="c-price">{{ getProductTotal(product) }} {{ $t('currency') }}</div>
+          <div class="c-price">{{ getProductTotal(product, index) }} {{ $t('currency') }}</div>
           <div class="c-remove" @click="removeFromCart(product)">
             <svg width="20px" height="20px"><use xlink:href="#icon-close"></use></svg>
             <span>{{ texts.removeLabel }}</span>
@@ -112,45 +127,59 @@ const props = defineProps({
     type: String,
     default: 'h1',
   },
+  // Ответ /api/cart/quote: актуальные цены и ошибки позиций
+  quote: {
+    type: Object,
+    default: null,
+  },
 })
 
+const MAX_QUANTITY = 10
 const cartStore = useCartStore()
-const { locale } = useI18n()
+const { t } = useI18n()
 
 const cartProducts = computed(() => cartStore.cartProducts)
-const texts = computed(() => (
-  locale.value === 'uk'
-    ? {
-        brandPrefix: 'Бренд: ',
-        sizeLabel: 'Розмір: ',
-        quantityLabel: 'Кількість: ',
-        removeLabel: 'Видалити',
-        emptyCart: 'Кошик порожній',
-      }
-    : {
-        brandPrefix: 'Бренд: ',
-        sizeLabel: 'Размер: ',
-        quantityLabel: 'Количество: ',
-        removeLabel: 'Удалить',
-        emptyCart: 'Корзина пуста',
-      }
-))
+const texts = computed(() => ({
+  brandPrefix: `${t('brand')}: `,
+  sizeLabel: `${t('size')}: `,
+  quantityLabel: `${t('quantity')}: `,
+  removeLabel: t('remove'),
+  emptyCart: t('cart_empty'),
+}))
 const resolvedEmptyText = computed(() => props.emptyText || texts.value.emptyCart)
-
-function getSelectedSizeId(product) {
-  return product?.size_selected?.[0]?.id ?? null
-}
 
 function getSelectedSizeName(product) {
   return product?.size_selected?.[0]?.name ?? ''
 }
 
-function getProductKey(product, index) {
-  const sizeId = getSelectedSizeId(product)
-  return sizeId ? `${product.id}-${sizeId}` : `${product.id}-${index}`
+function getProductKey(product) {
+  return cartLineKey(product)
 }
 
-function getProductTotal(product) {
+function quoteItem(index) {
+  return props.quote?.items?.find(item => item.index === index) ?? null
+}
+
+// Размер, цвет…: из котировки на языке страницы, пока её нет — как сохранили при добавлении.
+// Позиции, добавленные до выбора цвета, атрибутов не хранят — у них прежняя строка размера.
+function getAttributes(product, index) {
+  const saved = product?.attributes || []
+  if (!saved.length) return []
+
+  const names = new Set(saved.map(attribute => attribute.name))
+  const quoted = (quoteItem(index)?.attributes || []).filter(attribute => names.has(attribute.name))
+
+  return quoted.length ? quoted : saved
+}
+
+function itemError(index) {
+  return quoteItem(index)?.error ?? null
+}
+
+// Сумма позиции из котировки WP; пока её нет — по цене, сохранённой в корзине
+function getProductTotal(product, index) {
+  const item = quoteItem(index)
+  if (item && !item.error) return item.line_total
   return (Number(product?.price) || 0) * (Number(product?.quantity) || 0)
 }
 
@@ -160,13 +189,8 @@ function updateCartProducts(products) {
 }
 
 function findProductIndex(products, product) {
-  const targetSizeId = getSelectedSizeId(product)
-
-  if (targetSizeId !== null) {
-    return products.findIndex((item) => getSelectedSizeId(item) === targetSizeId)
-  }
-
-  return products.findIndex((item) => item.id === product.id)
+  const key = cartLineKey(product)
+  return products.findIndex(item => cartLineKey(item) === key)
 }
 
 function quantityMinus(product) {
@@ -189,7 +213,8 @@ function quantityPlus(product) {
   const allProducts = [...cartStore.cartProducts]
   const index = findProductIndex(allProducts, product)
 
-  if (index === -1) {
+  // WP принимает до 10 штук одной позиции
+  if (index === -1 || allProducts[index].quantity >= MAX_QUANTITY) {
     return
   }
 

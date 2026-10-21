@@ -2,19 +2,27 @@
   <main class="p-cart">
     <div class="u-container">
       <div class="p-cart__flex">
-        <LayoutLCart
-          :title="$t('cart')"
-          :show-empty="true"
-        />
+        <ClientOnly>
+          <LayoutLCart
+            :title="t('cart')"
+            :show-empty="true"
+            :quote="quote"
+          />
 
-        <LayoutLSidebarCart
-          v-model:coupon-code="couponCode"
-          coupon-input-id="cart_coupon_code"
-          :summary-items="summaryItems"
-          :checkout-link="localePath('/checkout')"
-          checkout-label="Оформить заказ"
-          @submit-coupon="submitCoupon"
-        />
+          <LayoutLSidebarCart
+            v-if="cartStore.cartProducts.length"
+            v-model:coupon-code="couponInput"
+            coupon-input-id="cart_coupon_code"
+            :applied-coupon="appliedCoupon"
+            :coupon-error="couponError"
+            :coupon-disabled="quoteStatus === 'pending'"
+            :summary-items="summaryItems"
+            :checkout-link="localePath('/checkout/')"
+            :checkout-label="t('checkout.go')"
+            @submit-coupon="submitCoupon"
+            @remove-coupon="clearCoupon"
+          />
+        </ClientOnly>
       </div>
     </div>
   </main>
@@ -25,26 +33,18 @@ const localePath = useLocalePath()
 const { t } = useI18n()
 const cartStore = useCartStore()
 
-const couponCode = ref('')
+useServicePageHead(() => t('cart'))
 
-const summaryItems = computed(() => [
-  {
-    label: 'Сумма заказа',
-    value: `${cartStore.totalAmount} ${t('currency')}`,
-    valueClass: 'c-price',
-  },
-  {
-    label: 'Доставка',
-    value: `0 ${t('currency')}`,
-    valueClass: 'c-price',
-  },
-  {
-    label: 'Всего',
-    value: `${cartStore.totalAmount} ${t('currency')}`,
-  },
-])
-
-function submitCoupon() {}
+const {
+  quote,
+  quoteStatus,
+  couponInput,
+  couponError,
+  appliedCoupon,
+  submitCoupon,
+  clearCoupon,
+  summaryItems,
+} = useCartSummary()
 </script>
 
 <style lang="scss">

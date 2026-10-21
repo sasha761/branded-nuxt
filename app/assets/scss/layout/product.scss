@@ -5,6 +5,13 @@
   	background-image: url(data:image/gif;base64,R0lGODlhCgAIAIABAN3d3f///yH5BAEAAAEALAAAAAAKAAgAAAINjAOnyJv2oJOrVXrzKQA7);
 	}
 
+	// Фото на всю ширину колонки и слайда, как в теме WP (там у img width="840" + max-width: 100%):
+	// маленькие оригиналы (371×557) тоже растягиваются
+	.js-lightbox img {
+		width: 100%;
+		height: auto;
+	}
+
 	&__img {
 		position: relative;
 
@@ -14,6 +21,21 @@
 
 		img {
 			display: block;
+		}
+
+		// Слайдер работает до 991px; шире — только главное фото, остальные в сетке под ним
+		@include mq('tablet-medium', min) {
+			.l-product__slide-extra,
+			.l-product__pagination {
+				display: none;
+			}
+		}
+
+		// место под точки слайдера (bottom: -25px)
+		@include mq('tablet-medium') {
+			&:has(.l-product__pagination) {
+				margin-bottom: 40px;
+			}
 		}
 
 		video {

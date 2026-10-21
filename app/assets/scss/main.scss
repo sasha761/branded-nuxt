@@ -16,3 +16,23 @@ img.lazy {
 	}
 }
 
+
+// Поле-ловушка для ботов в формах заказа и отзывов: людям не видно
+.u-honeypot {
+	position: absolute !important;
+	left: -10000px !important;
+	width: 1px;
+	height: 1px;
+	overflow: hidden;
+	opacity: 0;
+}
+
+// Ошибки форм вне .c-input (отзыв, общий текст ошибки заказа)
+.c-comments .error-msg,
+.c-form-error {
+	display: block;
+	font-size: 12px;
+	margin-top: 5px;
+	color: #dc143c;
+	text-align: left;
+}
