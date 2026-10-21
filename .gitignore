@@ -30,13 +30,3 @@ key.pem
 *.njsproj
 *.sln
 *.sw?
-
-node_modules
-.nuxt
-.output
-dist
-.env
-.env.*
-.idea
-.vscode
-.DS_Store
