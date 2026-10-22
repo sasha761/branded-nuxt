@@ -36,7 +36,7 @@ export function fetchPageRoute(path: string, signal?: AbortSignal) {
 
 /** api/route для пути; ключ общий, поэтому повторный вызов для того же пути не делает запрос. */
 export function useRouteData(path: string) {
-  return useAsyncData(`route:${path}`, ({ signal }) => fetchPageRoute(path, signal))
+  return useAsyncData(`route:${path}`, (_nuxtApp, { signal }) => fetchPageRoute(path, signal))
 }
 
 /** 404 только когда WP ответил 404; любая другая ошибка — 503, чтобы сбой WP не выкидывал страницы из индекса. */

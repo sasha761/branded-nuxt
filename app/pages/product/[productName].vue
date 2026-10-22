@@ -216,7 +216,7 @@ const productSlug = String(route.params.productName || '')
 
 const [routeRequest, productRequest] = await Promise.all([
   useRouteData(path),
-  useAsyncData(`product:${path}`, ({ signal }) => $fetch('/api/product/get_single_product', {
+  useAsyncData(`product:${path}`, (_nuxtApp, { signal }) => $fetch('/api/product/get_single_product', {
     params: { url: productSlug, lang: locale.value },
     signal,
   })),

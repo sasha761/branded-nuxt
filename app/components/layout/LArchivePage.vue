@@ -81,12 +81,17 @@ function decodedFullPath() {
 
 const routeRequest = props.pageRoute ? null : useRouteData(path)
 
-// Ключ меняется вместе с query: фильтры, сортировка и ?page= перезагружают товары.
+// Фильтры, сортировка и ?page= перезагружают товары. Метки рекламы (utm_*, gclid) в url не идут:
+// иначе у каждого клика свой ключ кеша Nitro и холодный запрос к WP.
+function archiveUrl() {
+  return normalizeArchiveUrl(decodedFullPath())
+}
+
 const productsRequest = useAsyncData(
-  () => `products:${props.onSale ? 'sale:' : ''}${route.fullPath}`,
-  ({ signal }) => $fetch('/api/archive/get_products', {
+  () => `products:${props.onSale ? 'sale:' : ''}${archiveUrl()}`,
+  (_nuxtApp, { signal }) => $fetch('/api/archive/get_products', {
     params: {
-      url: decodedFullPath(),
+      url: archiveUrl(),
       lang: locale.value,
       on_sale: props.onSale ? 1 : undefined,
     },
@@ -142,7 +147,7 @@ const listContext = computed(() => ({
   categories: archiveTitle.value ? archiveTitle.value.split(', ') : [],
 }))
 
-const hasFilters = computed(() => Object.keys(route.query).some(key => key !== 'page'))
+const hasFilters = computed(() => Object.keys(route.query).some(key => key !== 'page' && isArchiveParam(key)))
 const isReadMoreOpen = ref(false)
 
 usePageSeo(pageRoute, { totalPages })

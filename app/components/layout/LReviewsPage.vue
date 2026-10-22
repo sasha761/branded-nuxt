@@ -76,7 +76,7 @@ const pageTitle = computed(() => props.title || t('reviews'))
 
 const { data, status, error } = await useAsyncData(
   () => `reviews:${locale.value}:${currentPage.value}`,
-  ({ signal }) => $fetch('/api/reviews/reviews', {
+  (_nuxtApp, { signal }) => $fetch('/api/reviews/reviews', {
     params: {
       lang: locale.value,
       page: currentPage.value,

@@ -1,6 +1,7 @@
 import { fileURLToPath } from 'node:url'
 
-// Кеш ответов BFF (ключ включает query). Сбрасывается вебхуком WP: server/api/_revalidate.post.ts
+// Кеш ответов BFF (ключ включает query). Хранилище: server/plugins/cache-storage.ts (Redis или LRU).
+// Сбрасывается вебхуком WP: server/api/_revalidate.post.ts
 // Только GET-маршруты: кешированный обработчик Nitro не передаёт тело запроса, POST под таким правилом ломается.
 const apiCache = (maxAge: number) => ({ cache: { maxAge, staleMaxAge: 3600 } })
 
@@ -18,9 +19,6 @@ export default defineNuxtConfig({
   modules: ['@nuxtjs/i18n', '@pinia/nuxt'],
 
   i18n: {
-    bundle: {
-      optimizeTranslationDirective: false,
-    },
     locales: [
       {
         code: 'ru',
@@ -39,7 +37,7 @@ export default defineNuxtConfig({
     strategy: 'prefix_except_default',
     // URL как в WordPress: /uk/, /cart/, /product/x/
     trailingSlash: true,
-    lazy: true,
+    // Словари грузятся лениво (в i18n v10 всегда, опции lazy больше нет)
     langDir: '../i18n/locales',
     // Google не советует редирект по языку браузера, а с кешем HTML он ещё и закешируется.
     detectBrowserLanguage: false,
@@ -53,6 +51,8 @@ export default defineNuxtConfig({
     bffSecret: '',
     // = BRANDED_REVALIDATE_SECRET в wp-config.php
     revalidateSecret: '',
+    // Кеш Nitro в Redis (server/plugins/cache-storage.ts). Пусто — LRU в памяти процесса.
+    redisUrl: '',
     public: {
       // Домен сайта для canonical, hreflang и og:url
       siteUrl: 'https://branded.com.ua',

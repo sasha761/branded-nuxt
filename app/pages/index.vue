@@ -18,7 +18,7 @@ const path = useCurrentPath().value
 // SEO главной в её языке (раньше get_seo шёл без lang, и /uk/ получала русские title)
 const [routeRequest, homeRequest] = await Promise.all([
   useRouteData(path),
-  useAsyncData(`home:${locale.value}`, ({ signal }) => $fetch('/api/home/get_home_info', {
+  useAsyncData(`home:${locale.value}`, (_nuxtApp, { signal }) => $fetch('/api/home/get_home_info', {
     params: { lang: locale.value },
     signal,
   })),

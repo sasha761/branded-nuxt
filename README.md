@@ -6,7 +6,8 @@
 
 ## Требования
 
-- Node.js 22 LTS
+- Node.js 22.22.3+ или 24.15+ (требование Nuxt 4.6; на более старой 22.x dev-сервер предупреждает, что версия не поддерживается)
+- Redis 7 на сервере для кеша Nitro (необязательно: без него кеш живёт в памяти процесса)
 - WordPress с темой `news`. Локально это `http://branded.loc` в OSPanel, сайт доступен, только когда запущен OSPanel.
 
 ## Установка
@@ -27,6 +28,7 @@ cp .env.example .env
 | `NUXT_PUBLIC_SITE_URL` | Домен сайта для canonical, hreflang и og:url |
 | `NUXT_BFF_SECRET` | = `BRANDED_BFF_SECRET` в `wp-config.php`: WP доверяет IP покупателя из BFF (rate limit заказов) |
 | `NUXT_REVALIDATE_SECRET` | = `BRANDED_REVALIDATE_SECRET` в `wp-config.php`: вебхук сброса кеша `POST /api/_revalidate` |
+| `NUXT_REDIS_URL` | Кеш Nitro в Redis, общий для всех инстансов, например `redis://127.0.0.1:6379/1`. Пусто — кеш в памяти процесса |
 | `NUXT_PUBLIC_GTM_ID`, `NUXT_PUBLIC_FB_PIXEL_ID` | Аналитика. Задаются только на проде |
 
 > **Внимание.** Если `NUXT_WP_SITE_URL` указывает на прод (`https://branded.com.ua`), то заказы, отзывы и подписки из локального фронта настоящие: письма клиенту и админу, сообщения в Telegram, списание остатков.
@@ -55,6 +57,8 @@ cp .env.example .env
 | `app/composables/` | маршрут и SEO страницы, корзина и котировка, форма заказа, вариации товара, меню, аналитика |
 | `app/stores/cart.ts` | корзина (Pinia, хранится в `localStorage`) |
 | `server/api/` | BFF: проверка входа и проксирование в WP, вебхук сброса кеша |
+| `server/plugins/cache-storage.ts` | хранилище кеша Nitro: Redis или LRU в памяти |
+| `shared/utils/` | код для фронта и сервера сразу: нормализация query каталога (без `utm_*`, `gclid`) |
 | `server/middleware/` | 301-редиректы со старых URL WordPress, прокси sitemap Yoast |
 | `server/utils/wpFetch.ts` | клиент WP: таймаут и перевод ошибок WP в статусы 404 / 4xx / 503 |
 | `i18n/locales/` | строки интерфейса ru и uk |

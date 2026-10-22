@@ -34,7 +34,7 @@ const searchQuery = computed(() => {
 
 const { data: searchData, status } = await useAsyncData(
   () => `search:${locale.value}:${searchQuery.value}:${currentPage.value}`,
-  async ({ signal }) => {
+  async (_nuxtApp, { signal }) => {
     // WP ищет от 3 символов
     if (searchQuery.value.length < 3) {
       return { products: [], productsCount: 0, totalPages: 0 }

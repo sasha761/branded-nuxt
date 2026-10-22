@@ -72,7 +72,7 @@ const { locale, t } = useI18n()
 const localePath = useLocalePath()
 const path = useCurrentPath().value
 
-const { data, error } = await useAsyncData(`page:${path}`, async ({ signal }) => {
+const { data, error } = await useAsyncData(`page:${path}`, async (_nuxtApp, { signal }) => {
   const [routeResult, pageResult] = await Promise.allSettled([
     fetchPageRoute(path, signal),
     $fetch('/api/page/page', { params: { url: path, lang: locale.value }, signal }),
