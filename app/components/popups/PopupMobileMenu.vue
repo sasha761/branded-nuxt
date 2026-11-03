@@ -1,6 +1,6 @@
 <template>
   <div class="c-modal c-mobile-menu js-tab-mobile-menu" id="mobile-menu">
-    <UiCTab :data="data">
+    <UiCTab :data="tabs" :labels="tabLabels">
       <template #additionalFieldInTabNav>
         <svg @click="handleCloseClick" width="20px" height="20px" data-modal="close" class="c-mobile-menu__close">
           <use xlink:href="#icon-close"></use>
@@ -38,7 +38,21 @@ const props = defineProps({
 })
 
 const localePath = useLocalePath()
+const { t } = useI18n()
 const { close } = usePopup()
+
+// API отдаёт {man, woman}; вкладки как в теме WP: сначала «Женщинам»
+const tabs = computed(() => ({
+  menu: {
+    woman: props.data?.menu?.woman ?? [],
+    man: props.data?.menu?.man ?? [],
+  },
+}))
+
+const tabLabels = computed(() => ({
+  woman: t('for_women'),
+  man: t('for_men'),
+}))
 
 function handleCloseClick() {
   close(1)

@@ -73,22 +73,21 @@ const localePath = useLocalePath()
 const path = useCurrentPath().value
 
 const { data, error } = await useAsyncData(`page:${path}`, async (_nuxtApp, { signal }) => {
-  const [routeResult, pageResult] = await Promise.allSettled([
-    fetchPageRoute(path, signal),
-    $fetch('/api/page/page', { params: { url: path, lang: locale.value }, signal }),
-  ])
+  const route = await fetchPageRoute(path, signal)
 
-  if (routeResult.status === 'rejected') {
-    throw routeResult.reason
+  // Содержимое нужно только CMS-страницам. Архивы (/бренд/…, /color/…) рисует LArchivePage,
+  // и page/page отвечал бы для них 404 лишним запросом к WP. Запросы идут друг за другом,
+  // но оба кешируются в Nitro, так что разница есть только при холодном кеше.
+  if (route?.type !== 'page' || route.redirect || APP_PAGES[route.default_id]) {
+    return { route, page: null, pageError: null }
   }
 
-  return {
-    route: routeResult.value,
-    page: pageResult.status === 'fulfilled' ? pageResult.value : null,
+  try {
+    const page = await $fetch('/api/page/page', { params: { url: path, lang: locale.value }, signal })
+    return { route, page, pageError: null }
+  } catch (pageError) {
     // только статус: объект ошибки не сериализуется в payload
-    pageError: pageResult.status === 'rejected'
-      ? { statusCode: Number(pageResult.reason?.statusCode ?? pageResult.reason?.status) || 503 }
-      : null,
+    return { route, page: null, pageError: { statusCode: Number(pageError?.statusCode ?? pageError?.status) || 503 } }
   }
 })
 

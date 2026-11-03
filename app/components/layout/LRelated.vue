@@ -50,29 +50,6 @@ let swiperInstance = null
 const currentSlideIndex = ref(1)
 const allSlideIndex = ref(1)
 
-// onMounted(() => {
-//   if (relatedProductSlider.value) {
-//     swiperInstance = new Swiper(relatedProductSlider.value, {
-//       slidesPerView: 'auto',
-//       watchOverflow: true,
-//       autoplay: {
-//         delay: 2500,
-//         stopOnLastSlide: false,
-//         disableOnInteraction: true,
-//       },
-//       on: {
-//         slideChange(swiper) {
-//           currentSlideIndex.value = swiper.activeIndex + 1
-//         },
-//         afterInit(swiper) {
-//           console.log(swiper.snapGrid.length);
-//           allSlideIndex.value = swiper.snapGrid.length
-//         },
-//       },
-//     })
-//   }
-// })
-
 function updateSlideCounters(swiper) {
   currentSlideIndex.value = (swiper.activeIndex || 0) + 1
   allSlideIndex.value = swiper.snapGrid.length || 1
@@ -89,6 +66,8 @@ async function initSwiper() {
   }
 
   swiperInstance = new Swiper(relatedProductSlider.value, {
+    // Без модуля опция autoplay молча не работает
+    modules: [Autoplay],
     slidesPerView: 'auto',
     watchOverflow: true,
     autoplay: {

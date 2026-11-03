@@ -32,6 +32,12 @@
 				font-weight: 200;
 				font-size: 74px;
 			}
+
+			// Заголовок без цифры скидки: справа, как блок «-20% …» раньше
+			&.is-title {
+				max-width: none;
+				margin-left: auto;
+			}
 		}
 	}
 
@@ -114,6 +120,9 @@
 			margin-bottom: 40px;
 			.is-sale {
 				font-size: 65px;
+			}
+			span.is-title {
+				margin-left: 0;
 			}
 		}
 	}

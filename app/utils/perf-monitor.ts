@@ -133,7 +133,9 @@ function getNormalizedSegments(fullPath: string): string[] {
   const path = fullPath.split('#')[0]?.split('?')[0] || '/'
   const segments = path.split('/').filter(Boolean)
 
-  if (segments.length > 0 && KNOWN_LOCALES.has(segments[0])) {
+  const [firstSegment] = segments
+
+  if (firstSegment && KNOWN_LOCALES.has(firstSegment)) {
     return segments.slice(1)
   }
 

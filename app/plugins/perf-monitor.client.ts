@@ -179,13 +179,14 @@ export default defineNuxtPlugin((nuxtApp) => {
     }
 
     const nextLcpMs = roundMs(runtime.latestLcpMs)
+    const target = state.value.initialLoads[targetIndex]
 
-    if (state.value.initialLoads[targetIndex].lcpMs === nextLcpMs) {
+    if (!target || target.lcpMs === nextLcpMs) {
       return
     }
 
     state.value.initialLoads[targetIndex] = {
-      ...state.value.initialLoads[targetIndex],
+      ...target,
       lcpMs: nextLcpMs,
     }
     state.value.initialLoads = [...state.value.initialLoads]

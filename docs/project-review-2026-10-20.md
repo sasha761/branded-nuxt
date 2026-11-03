@@ -310,39 +310,52 @@ WordPress (тема news, inc/rest-api-*.php) ── WooCommerce, Yoast (Surface
 
 ### Шаг 4. Видимые баги и контент главной (около 1 дня)
 
-- [ ] Подписи вкладок мобильного меню взять из i18n вместо ключей `man` / `woman` (`CTab.vue`, `PopupMobileMenu.vue`).
-- [ ] `LBrand.vue:35`: `:key="product.id"`.
-- [ ] Поиск в шапке (`CSearchForm.vue`): отменять предыдущий запрос через `AbortController`, а не пропускать новый.
-- [ ] 👤 Решить судьбу текстов главной: «-20% … summer collection 2023», «VeroS…», «Ukrainian Underwear Essentials est. MMXX», «15 брендов», кнопка «Присоединиться» с `href="#"`. Варианты: убрать, перевести в i18n или вынести в ACF.
-- [ ] По решению — правки в `LOutlet.vue`, `LBrand.vue`, `LBranded.vue`.
-- [ ] Слайдеры: подключить модуль `Autoplay` в `LRelated.vue` (или убрать `autoplay`), уничтожать Swiper при размонтировании в `LHeroHome`, `LProductRow`, `LBrand`, `LOutlet` (P-f).
-- [ ] `[...page].vue`: запрашивать `page/page` только когда `api/route` вернул `type: 'page'` (P-g).
+- [x] Подписи вкладок мобильного меню взять из i18n вместо ключей `man` / `woman` (`CTab.vue`, `PopupMobileMenu.vue`). `CTab` принимает `labels`; вкладки в порядке темы WP: сначала «Женщинам» / «Жінкам», потом «Мужчинам» / «Чоловікам».
+- [x] `LBrand.vue:35`: `:key="product.id"`.
+- [x] Поиск в шапке (`CSearchForm.vue`): отменять предыдущий запрос через `AbortController`, а не пропускать новый. `useWaitRequest` остался для форм: там пропуск повторной отправки правильный. ✔ API задержан на 3 с: «сум» → «сумка» — запрос «сум» прерван (`ERR_ABORTED`), в подсказках результат для «сумка».
+- [x] 👤 Решить судьбу текстов главной. Решение 22.10: нейтральный заголовок вместо акции, кнопку «Стать участником» убрать.
+- [x] Правки в `LOutlet.vue`, `LBrand.vue`, `LBranded.vue`, все тексты в i18n (на живом сайте они те же, по-английски на обоих языках):
+  - «-20% for the entire summer collection 2023» → «Сумки и аксессуары VeroS» / «Сумки та аксесуари VeroS» (модификатор `is-title`: на десктопе справа, как раньше, на телефоне слева);
+  - «VeroS bags and accessories» → «Коллекция VeroS»; «VeroS brand sales» → «Сумки со скидкой» (в слайдере `products_sale`, там не только VeroS);
+  - «Ukrainian Underwear Essentials est. MMXX» → «Украинское базовое белье с 2020 года» / «Українська базова білизна з 2020 року»;
+  - «15 брендов» без кнопки. Попутно: стили `.c-appeal` (крупная контурная цифра) при переносе из `main.scss` темы потерялись, «15» выводилась мелким текстом. Перенесены в `layout/branded.scss`.
+- [x] Слайдеры (P-f): `Autoplay` подключён в `LRelated.vue` (опция была, модуля не было), закомментированная старая версия удалена; `destroy` при размонтировании в `LHeroHome`, `LProductRow`, `LBrand`, `LOutlet`. ✔ После клиентского перехода с главной уничтожены 4/4, автопрокрутка похожих работает.
+- [x] `[...page].vue`: `page/page` запрашивается только когда `api/route` вернул `type: 'page'` (без `redirect` и не корзина/checkout) (P-g). ✔ `/бренд/suns-house/`, `/sezon/zima/` — только `api/route`; `/reviews/`, `/sales/`, `/dostavka-i-oplata/` — `api/route` и `page/page`.
+- [x] Найдено по ходу: при быстром переходе (новая ссылка до загрузки текущей) мелькала «Страница не найдена». Nuxt отменяет `useAsyncData` уходящей страницы, та получала пустые данные и бросала фатальную 404 поверх новой. Проблема была и раньше: отмену делает сам Nuxt, независимо от `signal` в обработчике. Теперь `guardPageRoute` на клиенте при «ни данных, ни ошибки» не бросает 404, а не продолжает setup. ✔ API задержан на 1,5 с, переходы через 0,5 с: ошибок нет, открывается последняя страница; настоящий 404 при клиентском переходе по-прежнему показывает страницу ошибки.
 
-**Готово, когда:** на мобильном меню русские и украинские подписи, на главной нет устаревших акций, поиск показывает результат последнего введённого текста.
+Проверка: `nuxi build`; SSR-снимок 27 URL совпал с базовым; смоук в Chrome (главная, категория, фильтр, товар, лайтбокс, корзина, мобильный) без ошибок; скриншоты блоков главной ru/uk до и после; `nuxi typecheck` — те же 12 ошибок.
+
+**Готово, когда:**
+- [x] на мобильном меню русские и украинские подписи;
+- [x] на главной нет устаревших акций;
+- [x] поиск показывает результат последнего введённого текста.
 
 ### Шаг 5. CI, проверка типов, тесты (4–5 дней)
 
-- [ ] Исправить 12 ошибок `nuxi typecheck` (Q-a):
-  - `@types/node` в devDependencies;
-  - `useSeo.ts:44`: массивы `meta`/`link` типизировать под unhead v3 (после обновления на шаге 3);
-  - `usePopup.ts:30`;
-  - `tagPosition` в `plugins/analytics.ts` (`as const`);
-  - perf-monitor;
-  - опция `api` у sass в `nuxt.config.ts`.
-- [ ] GitHub Actions для Nuxt (G3): `npm ci`, `nuxi typecheck`, `nuxi build` на каждый push и PR.
-- [ ] GitHub Actions для темы (G3): `php -l` по `inc/*.php` и `functions.php`.
-- [ ] Unit-тесты на Vitest (Q-b):
-  - `useProductVariation`;
-  - `cartLineKey` и `toCartItem`;
-  - `cartProducts` из `server/utils/cart.ts`;
-  - `normalizePath`, `parseOrderUrl`, `normalizePhone`;
-  - `server/middleware/01.redirects.ts`.
-- [ ] E2E-смоук на Playwright против локального WP или staging, **не против прода** (Q-b):
-  - главная → категория → фильтр → товар → выбор цвета и размера → корзина → checkout с ошибкой поля;
-  - проверка `<head>` на 10–20 URL: статус, canonical, hreflang, robots, H1.
-- [ ] Подключить тесты в CI.
+- [x] Исправить 12 ошибок `nuxi typecheck` (Q-a). ✔ 0 ошибок:
+  - `@types/node` 24 в devDependencies (5 ошибок в `nuxt.config.ts` и `_revalidate.post.ts`);
+  - `useSeo.ts`: массивы `meta`/`link` типизированы `ResolvableMeta` / `ResolvableLink` из `@unhead/vue`, вывод `<head>` не изменился (SSR-снимок 27 URL совпал);
+  - `usePopup.ts`, `perf-monitor` (×3): обращения по индексу через проверку;
+  - `tagPosition: 'bodyOpen' as const` в `plugins/analytics.ts`;
+  - опция `api` у sass убрана: в Vite 7+ её нет, компилятор и так modern.
+- [x] GitHub Actions для Nuxt (G3): `.github/workflows/ci.yml` — Node 24, `npm ci`, `nuxi typecheck`, `npm test`, `npm run build` на каждый push и PR. ✔ Шаги прогнаны локально на чистой копии (без `node_modules` и `.nuxt`): все зелёные. Первый запуск на GitHub будет после push.
+- [x] GitHub Actions для темы (G3): `.github/workflows/php-lint.yml` — `php -l` по всем PHP-файлам в git (93), PHP 8.1, 8.3 и 8.4. В `.gitignore` темы правило `.*` скрывало `.github/` — добавлено исключение. ✔ Локально все 93 файла проходят на PHP 8.1 и 8.4.
+- [x] Unit-тесты на Vitest (Q-b): `vitest.config.ts`, два проекта. 70 тестов, около 1,5 с:
+  - `unit` (Node): `redirectTarget` (правила вынесены из `server/middleware/01.redirects.ts` в `server/utils/redirects.ts`, поведение то же), `normalizeArchiveUrl`, `cartProducts`, `normalizePhone`;
+  - `nuxt` (`@nuxt/test-utils`, окружение Nuxt): `useProductVariation` (по образцу шорт Lexie: переключение на вариацию в наличии, «любой» цвет, всё распродано, простой товар), `cartLineKey` и `toCartItem`, `normalizePath`, `parseOrderUrl`;
+  - ✔ мутации ловятся: без переключения на вариацию в наличии падают 2 теста, с перепутанной пагинацией `/page/1/` — 1.
+  - Для `@nuxt/test-utils` нужен тот же Vite, что у Nuxt 4.6: добавлен `vite@8` в devDependencies (иначе Vitest брал Vite 7, и плагины Nuxt для rolldown падали).
+- [x] E2E-смоук на Playwright (Q-b): `playwright.config.ts`, `test/e2e/`. Сервер — production-сборка на порту 3100, WP — `E2E_WP_URL` (по умолчанию `http://branded.loc`) или готовый сайт через `E2E_BASE_URL`:
+  - `shop-flow`: главная → категория из меню → фильтр → первый доступный товар → цвет и размер → корзина (котировка 200) → checkout с неверным телефоном: ошибка у поля, запроса `create_order` нет, ошибок JS нет;
+  - `head`: главная, категория и товар на ru и uk (self-canonical, hreflang ru/uk/x-default, без noindex, один H1, `<html lang>`, JSON-LD Product), `?page=2`, UTM, `noindex` корзины, checkout и поиска, 4 редиректа 301, два 404 — около 20 URL; категория и товар берутся с главной, тест не зависит от копии базы.
+  - ✔ 11/11. Локальный WP был выключен, поэтому один прогон сделан с прод-WP (`E2E_WP_URL=https://branded.com.ua`): только чтение, корзина в `localStorage`, заказ не отправляется — тест это проверяет.
+- [x] Подключить тесты в CI: unit-тесты (`npm test`) в `ci.yml`. E2E в CI — когда появится staging (шаг 7): им нужен WP.
+- [x] Попутно: npm 11 (Node 24) не запускает install-скрипты без разрешения. `esbuild`, `@parcel/watcher`, `vue-demi` явно запрещены в `allowScripts` (`package.json`): все работают без скриптов (готовые бинарники из optional-зависимостей, `vue-demi` уже собран под Vue 3). Поведение `npm ci` одинаковое локально и в CI.
+- [x] Попутно: проверка регистра путей в импортах (на Linux в CI и на VPS он важен) — расхождений нет.
 
-**Готово, когда:** CI зелёный на ветке, тесты падают при поломке выбора вариации или редиректа.
+**Готово, когда:**
+- [ ] CI зелёный на ветке — после push (локально все шаги CI зелёные);
+- [x] тесты падают при поломке выбора вариации или редиректа.
 
 ### Шаг 6. VPS и инфраструктура (4–5 дней; раздел 5 прошлого плана)
 
@@ -379,6 +392,7 @@ WordPress (тема news, inc/rest-api-*.php) ── WooCommerce, Yoast (Surface
 ### Шаг 7. Staging и сверка (2–3 дня; этап 6 прошлого плана)
 
 - [ ] 👤 Поднять staging: копия прод-БД, basic-auth, `X-Robots-Tag: noindex`, ID аналитики пустые.
+- [ ] E2E (`npm run test:e2e`) в CI против staging: `E2E_BASE_URL` из секретов репозитория, `npx playwright install --with-deps chromium`.
 - [ ] Скрипт сверки ~1150 URL из sitemap и топа страниц из GSC, staging против живого сайта. Сравнивать статус, canonical, hreflang, title, description, H1, robots, набор картинок, JSON-LD.
 - [ ] Разобрать каждое расхождение: исправить или объяснить.
 - [ ] Rich Results Test (Product, BreadcrumbList) для 5–10 URL: не хуже живого сайта.

@@ -41,7 +41,21 @@ cp .env.example .env
 | `npm run build` | production-сборка в `.output/` |
 | `npm run preview` | запуск собранного приложения |
 | `node .output/server/index.mjs` | запуск production-сборки (порт из `PORT`, по умолчанию 3000) |
-| `npx nuxi typecheck` | проверка типов (пока с ошибками, см. `docs/project-review-2026-10-20.md`) |
+| `npx nuxi typecheck` | проверка типов |
+| `npm test` | unit-тесты (Vitest): проекты `unit` (чистые функции, Node) и `nuxt` (composables и стор в окружении Nuxt) |
+| `npm run test:unit` | только проект `unit`, без запуска Nuxt (около секунды) |
+| `npm run test:e2e` | E2E-смоук (Playwright) против production-сборки: сначала `npm run build` |
+
+## Тесты и CI
+
+- **Unit** лежат в `test/unit/` и `test/nuxt/`: редиректы, нормализация query каталога, позиции корзины для WP, телефон, выбор вариации, ключ позиции корзины, пути, разбор ответа `create_order`.
+- **E2E** лежат в `test/e2e/`:
+  - сценарий покупателя: главная → категория → фильтр → товар → корзина → checkout с ошибкой поля (заказ не отправляется);
+  - SSR-проверка `<head>` и статусов: canonical, hreflang, robots, H1, пагинация, UTM, `noindex` служебных страниц, 301 и 404.
+
+  Playwright сам запускает `.output/server/index.mjs` на порту 3100 и ходит в WP по адресу `E2E_WP_URL`, по умолчанию локальный `http://branded.loc` (нужен запущенный OSPanel). Против staging: `E2E_BASE_URL=https://staging…`. Браузер — `npx playwright install chromium` один раз или установленный Chrome через `E2E_CHANNEL=chrome`. Регулярно против прода не запускать.
+- **CI** (`.github/workflows/ci.yml`) на каждый push и pull request: `npm ci`, `nuxi typecheck`, `npm test`, `npm run build`. E2E в CI появятся вместе со staging.
+- npm 11 не запускает install-скрипты пакетов без разрешения. Для `esbuild`, `@parcel/watcher` и `vue-demi` они явно запрещены (`allowScripts` в `package.json`): все три работают и без скриптов. Новый пакет со скриптом npm покажет в `npm install-scripts ls`.
 
 ### Особенности Windows
 
@@ -59,7 +73,8 @@ cp .env.example .env
 | `server/api/` | BFF: проверка входа и проксирование в WP, вебхук сброса кеша |
 | `server/plugins/cache-storage.ts` | хранилище кеша Nitro: Redis или LRU в памяти |
 | `shared/utils/` | код для фронта и сервера сразу: нормализация query каталога (без `utm_*`, `gclid`) |
-| `server/middleware/` | 301-редиректы со старых URL WordPress, прокси sitemap Yoast |
+| `server/middleware/` | 301-редиректы со старых URL WordPress (правила — `server/utils/redirects.ts`), прокси sitemap Yoast |
+| `test/` | `unit/`, `nuxt/` — Vitest; `e2e/` — Playwright |
 | `server/utils/wpFetch.ts` | клиент WP: таймаут и перевод ошибок WP в статусы 404 / 4xx / 503 |
 | `i18n/locales/` | строки интерфейса ru и uk |
 | `docs/` | справочник API и ревью проекта |

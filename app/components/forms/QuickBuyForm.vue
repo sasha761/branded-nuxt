@@ -1,11 +1,6 @@
 <template>
   <form @submit.prevent="submitForm" class="c-form" name="quick-buy" novalidate>
-    <template v-if="size?.attributes?.length">
-      <p v-for="attribute in size.attributes" :key="attribute.label" class="c-form__size">
-        {{ attribute.label }}: <b>{{ attribute.value }}</b>
-      </p>
-    </template>
-    <p v-else-if="sizeName" class="c-form__size">{{ t('size') }}: <b>{{ sizeName }}</b></p>
+    
 
     <div v-for="field in fields" :key="field.name" class="c-input">
       <input

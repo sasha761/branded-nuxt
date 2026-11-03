@@ -26,8 +26,8 @@ export function usePopup(level: number = 1) {
   }
 
   function closeAll() {
-    for (const key in popupStates) {
-      popupStates[key].value = { name: null, data: null }
+    for (const popupState of Object.values(popupStates)) {
+      popupState.value = { name: null, data: null }
     }
   }
 

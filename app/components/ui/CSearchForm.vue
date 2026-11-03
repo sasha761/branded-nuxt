@@ -30,12 +30,12 @@
 const { locale, t } = useI18n()
 const localePath = useLocalePath()
 const router = useRouter()
-const { requestInProgress, waitRequest } = useWaitRequest()
-
 const searchInput = ref('')
 const searchResult = ref([])
 const searchContainerVisability = ref(false)
 const debounceTimeout = ref(null)
+const requestInProgress = ref(false)
+let searchController = null
 
 watch(searchInput, (newValue) => {
   if (newValue.length >= 3) {
@@ -43,24 +43,47 @@ watch(searchInput, (newValue) => {
     return
   }
 
-  clearDebounceTimeout()
+  cancelSearch()
 })
 
+onBeforeUnmount(cancelSearch)
+
+// Новый запрос отменяет предыдущий: в подсказках всегда результат последнего введённого текста.
+// (Раньше новый запрос пропускался, пока WP отвечал на старый, и подсказки отставали от ввода.)
 function fetchSearch() {
-  if (!searchInput.value.trim() || searchInput.value.trim().length < 3) return
+  const query = searchInput.value.trim()
+  if (query.length < 3) return
   searchContainerVisability.value = true
-  waitRequest(() => {
-    return $fetch('/api/search/search', {
-      params: { lang: locale.value, query: searchInput.value.trim(), posts_per_page: 7 },
-    })
+
+  searchController?.abort()
+  const controller = new AbortController()
+  searchController = controller
+  requestInProgress.value = true
+
+  $fetch('/api/search/search', {
+    params: { lang: locale.value, query, posts_per_page: 7 },
+    signal: controller.signal,
+  })
     .then((result) => {
+      if (searchController !== controller) return
       searchResult.value = result?.products || []
     })
     .catch((error) => {
+      if (controller.signal.aborted) return
       console.error(error)
       searchContainerVisability.value = false
     })
-  })
+    .finally(() => {
+      if (searchController === controller) {
+        searchController = null
+        requestInProgress.value = false
+      }
+    })
+}
+
+function cancelSearch() {
+  clearDebounceTimeout()
+  searchController?.abort()
 }
 
 function handleCloseClick() {
@@ -85,7 +108,7 @@ async function goToSearchPage() {
 }
 
 function handleSearchSubmit() {
-  clearDebounceTimeout()
+  cancelSearch()
   goToSearchPage()
   handleCloseClick()
 }

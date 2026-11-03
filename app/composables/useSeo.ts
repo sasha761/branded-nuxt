@@ -1,4 +1,5 @@
 import type { MaybeRefOrGetter } from 'vue'
+import type { ResolvableLink, ResolvableMeta } from '@unhead/vue'
 import type { PageRoute } from '~/types/wp-api'
 
 interface PageSeoOptions {
@@ -53,10 +54,12 @@ export function usePageSeo(pageRoute: MaybeRefOrGetter<PageRoute | null | undefi
     const totalPages = Number(toValue(options.totalPages) || 0)
     const baseCanonical = seo.canonical ? absolute(seo.canonical) : ''
 
-    const meta: Record<string, string>[] = []
+    const meta: ResolvableMeta[] = []
     const addMeta = (attr: 'name' | 'property', key: string, content: unknown) => {
       if (content !== undefined && content !== null && content !== '') {
-        meta.push({ [attr]: key, content: String(content), key })
+        meta.push(attr === 'name'
+          ? { name: key, content: String(content), key }
+          : { property: key, content: String(content), key })
       }
     }
 
@@ -75,7 +78,7 @@ export function usePageSeo(pageRoute: MaybeRefOrGetter<PageRoute | null | undefi
     addMeta('property', 'og:image:type', seo.og_image_type)
     addMeta('name', 'twitter:card', seo.twitter_card)
 
-    const link: Record<string, string>[] = []
+    const link: ResolvableLink[] = []
 
     if (baseCanonical) {
       link.push({ rel: 'canonical', href: withPage(baseCanonical, page), key: 'canonical' })

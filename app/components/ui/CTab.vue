@@ -8,7 +8,7 @@
         @click="toggleTab(index)"
         class="c-tab__item"
       >
-        {{ name }}
+        {{ labels[name] || name }}
       </span>
       <slot name="additionalFieldInTabNav"></slot>
     </div>
@@ -28,6 +28,8 @@
 <script setup>
 defineProps({
   data: { type: Object, required: true },
+  // Подписи вкладок по ключам data.menu; без подписи выводится сам ключ
+  labels: { type: Object, default: () => ({}) },
 })
 
 const activeTab = ref(0)

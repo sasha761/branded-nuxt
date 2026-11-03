@@ -2,8 +2,7 @@
   <section class="l-outlet">
     <div class="u-container">
       <h3 class="u-h2">
-        <span class="is-sale">-20%</span>
-        <span>for the entire summer collection 2023</span>
+        <span class="is-title">{{ $t('home.outlet_title') }}</span>
       </h3>
       <div class="l-outlet__content">
         <div class="l-outlet__content-left">
@@ -20,13 +19,13 @@
             </div>
           </div>
           <div class="d-flex align-items-center justify-content-between is-title">
-            <p class="u-text">VeroS bags and accessories</p>
+            <p class="u-text">{{ $t('home.outlet_collection') }}</p>
             <NuxtLink :to="siteLink('accessories')" class="u-btn is-black">{{ $t('home.all_collection') }}</NuxtLink>
           </div>
         </div>
         <div class="l-outlet__content-right js-slider-container">
           <div class="align-items-center justify-content-between d-none d-lg-flex is-title">
-            <p class="u-text">VeroS brand sales</p>
+            <p class="u-text">{{ $t('home.outlet_sale') }}</p>
             <div class="l-outlet__arrow">
               <div class="c-arrow is-small">
                 <div @click="slidePrev" class="c-arrow__prev js-prev">
@@ -102,6 +101,11 @@ onMounted(() => {
       },
     })
   }
+})
+
+onBeforeUnmount(() => {
+  swiperInstance?.destroy(true, true)
+  swiperInstance = null
 })
 
 function slideNext() {

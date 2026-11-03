@@ -29,10 +29,11 @@ const props = defineProps({
 })
 
 const productRow = ref(null)
+let swiperInstance = null
 
 onMounted(() => {
   if (productRow.value) {
-    new Swiper(productRow.value, {
+    swiperInstance = new Swiper(productRow.value, {
       modules: [Autoplay],
       slidesPerView: 'auto',
       watchOverflow: true,
@@ -43,6 +44,11 @@ onMounted(() => {
       },
     })
   }
+})
+
+onBeforeUnmount(() => {
+  swiperInstance?.destroy(true, true)
+  swiperInstance = null
 })
 </script>
 

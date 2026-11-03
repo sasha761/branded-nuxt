@@ -76,7 +76,6 @@ export default defineNuxtConfig({
     css: {
       preprocessorOptions: {
         scss: {
-          api: 'modern-compiler',
           silenceDeprecations: ['import', 'global-builtin'],
           additionalData: '@import "~/assets/scss/utility/mq.scss";',
         },

@@ -69,6 +69,7 @@ const props = defineProps({
 
 const siteLink = useSiteLink()
 const bannerSlider = ref(null)
+let swiperInstance = null
 
 const firstBannerImg = computed(() => props.data?.banners?.[0]?.img)
 useHead({
@@ -81,8 +82,13 @@ useHead({
 
 onMounted(() => {
   if (bannerSlider.value) {
-    new Swiper(bannerSlider.value)
+    swiperInstance = new Swiper(bannerSlider.value)
   }
+})
+
+onBeforeUnmount(() => {
+  swiperInstance?.destroy(true, true)
+  swiperInstance = null
 })
 </script>
 

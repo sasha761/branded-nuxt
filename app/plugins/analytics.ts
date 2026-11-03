@@ -26,7 +26,7 @@ export default defineNuxtPlugin((nuxtApp) => {
     })
     noscript.push({
       key: 'gtm-noscript',
-      tagPosition: 'bodyOpen',
+      tagPosition: 'bodyOpen' as const,
       innerHTML: `<iframe src="https://www.googletagmanager.com/ns.html?id=${gtm}" height="0" width="0" style="display:none;visibility:hidden"></iframe>`,
     })
   }
@@ -38,7 +38,7 @@ export default defineNuxtPlugin((nuxtApp) => {
     })
     noscript.push({
       key: 'fb-pixel-noscript',
-      tagPosition: 'bodyOpen',
+      tagPosition: 'bodyOpen' as const,
       innerHTML: `<img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=${pixel}&ev=PageView&noscript=1">`,
     })
   }

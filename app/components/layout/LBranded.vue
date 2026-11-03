@@ -20,7 +20,6 @@
             <span class="is-number">15</span>
             <p class="u-h3">{{ $t('home.brands') }}</p>
             <p class="u-h4">{{ $t('home.brands_community') }}</p>
-            <a href="#" class="u-btn is-orange">{{ $t('home.join') }}</a>
           </div>
         </div>
         <div class="l-branded__products d-none d-sm-block">

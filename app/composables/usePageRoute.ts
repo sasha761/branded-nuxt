@@ -67,6 +67,13 @@ export function guardPageRoute(pageRoute: PageRoute | null | undefined, routeErr
   }
 
   if (!pageRoute) {
+    // Ни данных, ни ошибки — запрос отменён: пользователь ушёл на другую страницу, пока эта грузилась,
+    // и Nuxt отменил useAsyncData уходящей страницы. Фатальная 404 здесь показала бы «Страница
+    // не найдена» поверх новой страницы. Setup уходящей страницы просто не продолжается.
+    if (import.meta.client) {
+      return new Promise<never>(() => {})
+    }
+
     throwPageError({ statusCode: 404 })
   }
 

@@ -8,7 +8,7 @@
           <div class="l-brand__title">
             <NuxtLink :to="siteLink('brandWearme')" class="u-btn is-black">{{ $t('home.all_collection') }}</NuxtLink>
             <h2 class="u-h2">{{ $t('home.bodies_title') }}</h2>
-            <p>Ukrainian Underwear Essentials est. MMXX</p>
+            <p>{{ $t('home.bodies_text') }}</p>
           </div>
           <div class="l-brand__arrow">
             <div class="c-arrow is-small">
@@ -32,7 +32,7 @@
 
         <div ref="productRowSlider" class="row swiper">
           <div class="swiper-wrapper">
-            <div v-for="product in data" :key="product.ID" class="col-lg-4 col-md-4 col-sm-6 col-6 u-col swiper-slide">
+            <div v-for="product in data" :key="product.id" class="col-lg-4 col-md-4 col-sm-6 col-6 u-col swiper-slide">
               <UiCProduct :product="product" />
             </div>
           </div>
@@ -79,6 +79,11 @@ onMounted(() => {
       },
     })
   }
+})
+
+onBeforeUnmount(() => {
+  swiperInstance?.destroy(true, true)
+  swiperInstance = null
 })
 
 function slideNext() {

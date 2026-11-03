@@ -1,0 +1,37 @@
+# Проверка на каждый push и pull request: типы, unit-тесты, production-сборка.
+# E2E (Playwright) здесь не запускаются: им нужен WordPress — локальный или staging (шаг 7 чек-листа).
+name: CI
+
+on:
+  push:
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          # Nuxt 4.6 требует Node ^22.22.3 или ^24.15
+          node-version: 24
+          cache: npm
+
+      # postinstall выполняет nuxt prepare (типы и .nuxt для typecheck и тестов)
+      - run: npm ci
+
+      - name: Typecheck
+        run: npx nuxi typecheck
+
+      - name: Unit tests
+        run: npm test
+
+      - name: Build
+        run: npm run build
