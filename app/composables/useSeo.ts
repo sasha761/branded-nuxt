@@ -92,7 +92,12 @@ export function usePageSeo(pageRoute: MaybeRefOrGetter<PageRoute | null | undefi
       }
     }
 
-    if (page <= 1) {
+    // Без перевода отдельный набор hreflang не нужен; переключатель языка
+    // по-прежнему получает полный info.alternates выше.
+    const translatedLanguages = new Set((info.alternates || [])
+      .filter(alternate => alternate.lang !== 'x-default')
+      .map(alternate => alternate.lang))
+    if (page <= 1 && translatedLanguages.size > 1) {
       for (const alternate of info.alternates || []) {
         link.push({
           rel: 'alternate',

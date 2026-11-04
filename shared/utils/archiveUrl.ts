@@ -32,3 +32,23 @@ export function normalizeArchiveUrl(url: string) {
   const path = withoutHash.slice(0, queryStart)
   return params.length ? `${path}?${new URLSearchParams(params)}` : path
 }
+
+/**
+ * Адрес страницы для кеша HTML (server/plugins/html-cache.ts): путь и параметры каталога,
+ * как в normalizeArchiveUrl. Остальные параметры (метки рекламы и любой мусор) — отдельно в `dropped`:
+ * их возвращают в Location, если страница ответила редиректом.
+ * На кешируемых страницах (главная, каталог, товар, страницы WP) приложение читает только параметры
+ * каталога. Новый параметр, от которого зависит вывод такой страницы, добавить в ARCHIVE_PARAMS —
+ * иначе SSR его не увидит.
+ */
+export function splitPageUrl(url: string): { url: string, dropped: string } {
+  const withoutHash = url.split('#')[0] || ''
+  const queryStart = withoutHash.indexOf('?')
+
+  if (queryStart === -1) {
+    return { url: withoutHash, dropped: '' }
+  }
+
+  const dropped = [...new URLSearchParams(withoutHash.slice(queryStart + 1))].filter(([key]) => !isArchiveParam(key))
+  return { url: normalizeArchiveUrl(withoutHash), dropped: new URLSearchParams(dropped).toString() }
+}

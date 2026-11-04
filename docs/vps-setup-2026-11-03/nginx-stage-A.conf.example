@@ -1,0 +1,47 @@
+# Stage A: move the existing WordPress site without changing its public URLs.
+# INACTIVE TEMPLATE. Install matching TLS certificate files before enabling.
+# Copy into aaPanel's vhost directory only during the migration window.
+server {
+    listen 80;
+    server_name branded.com.ua www.branded.com.ua;
+    location ^~ /.well-known/acme-challenge/ { root /srv/branded/acme; }
+    location / { return 301 https://branded.com.ua$request_uri; }
+}
+server {
+    listen 443 ssl;
+    server_name www.branded.com.ua;
+    ssl_certificate /etc/branded/tls/branded/fullchain.pem;
+    ssl_certificate_key /etc/branded/tls/branded/privkey.pem;
+    return 301 https://branded.com.ua$request_uri;
+}
+server {
+    listen 443 ssl;
+    server_name branded.com.ua;
+    ssl_certificate /etc/branded/tls/branded/fullchain.pem;
+    ssl_certificate_key /etc/branded/tls/branded/privkey.pem;
+    ssl_protocols TLSv1.2 TLSv1.3;
+    root /srv/branded/wordpress;
+    index index.php;
+    client_max_body_size 64m;
+    access_log /var/log/branded/public-access.log;
+    error_log /var/log/branded/public-error.log;
+    add_header X-Content-Type-Options nosniff always;
+    add_header Referrer-Policy strict-origin-when-cross-origin always;
+    add_header Content-Security-Policy "frame-ancestors 'self';" always;
+    add_header Strict-Transport-Security "max-age=31536000" always;
+    location ~ /\. { deny all; }
+    location = /wp-config.php { deny all; }
+    location = /xmlrpc.php { return 403; }
+    location = /wp-cron.php { return 403; }
+    location ~* ^/wp-content/.*\.(?:php[0-9]*|phtml|phar)(?:/|$) { return 403; }
+    location / { try_files $uri $uri/ /index.php?$args; }
+    location ~ \.php$ {
+        try_files $uri =404;
+        include fastcgi_params;
+        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+        fastcgi_param HTTPS on;
+        fastcgi_param SERVER_PORT 443;
+        fastcgi_read_timeout 120s;
+        fastcgi_pass unix:/run/branded-php/php-fpm.sock;
+    }
+}

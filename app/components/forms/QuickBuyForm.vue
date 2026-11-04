@@ -1,7 +1,5 @@
 <template>
   <form @submit.prevent="submitForm" class="c-form" name="quick-buy" novalidate>
-    
-
     <div v-for="field in fields" :key="field.name" class="c-input">
       <input
         :type="field.type"
@@ -40,8 +38,8 @@ const router = useRouter()
 const { close } = usePopup()
 
 const product = computed(() => props.popupData?.product)
+// Выбранный вариант в попапе не показывается (решение 03.11), только уходит в заказ
 const size = computed(() => props.popupData?.size || null)
-const sizeName = computed(() => (size.value?.name && size.value.name !== 'one size' ? size.value.name : ''))
 
 const { formData, v$, fieldError, formError, submit, requestInProgress } = useOrderForm(() => [{
   id: product.value?.id,

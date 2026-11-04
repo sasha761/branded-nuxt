@@ -43,6 +43,7 @@ test('главная → категория → фильтр → товар → 
   await page.locator('.l-filter-block__desktop-filters .v-select').first().click()
   await page.locator('.vs__dropdown-option').first().click()
   await page.waitForURL(/\?\w+=/)
+  expect(new URL(page.url()).pathname, 'путь без //').toBe(categoryPath)
   await expect(page.locator('.c-product').first()).toBeVisible()
 
   await openBuyableProduct(page)

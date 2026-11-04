@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { isArchiveParam, normalizeArchiveUrl } from '../../shared/utils/archiveUrl'
+import { isArchiveParam, normalizeArchiveUrl, splitPageUrl } from '../../shared/utils/archiveUrl'
 
 describe('normalizeArchiveUrl', () => {
   it('убирает метки рекламы', () => {
@@ -39,6 +39,26 @@ describe('normalizeArchiveUrl', () => {
   it('идемпотентна: повторная нормализация ничего не меняет', () => {
     const once = normalizeArchiveUrl('/x/?s=сумка женская&page=2&utm_source=a')
     expect(normalizeArchiveUrl(once)).toBe(once)
+  })
+})
+
+describe('splitPageUrl (ключ и рендер кеша HTML)', () => {
+  it('метки уходят в dropped, параметры каталога остаются', () => {
+    expect(splitPageUrl('/product-category/women/?page=2&gclid=AAA&utm_source=fb'))
+      .toEqual({ url: '/product-category/women/?page=2', dropped: 'gclid=AAA&utm_source=fb' })
+  })
+
+  it('разные клики по рекламе — один адрес страницы', () => {
+    expect(splitPageUrl('/product/x/?gclid=AAA').url).toBe(splitPageUrl('/product/x/?fbclid=BBB&utm_campaign=c').url)
+  })
+
+  it('без query и без меток dropped пустой', () => {
+    expect(splitPageUrl('/product/x/')).toEqual({ url: '/product/x/', dropped: '' })
+    expect(splitPageUrl('/product/x/?color=red')).toEqual({ url: '/product/x/?color=red', dropped: '' })
+  })
+
+  it('любой посторонний параметр не попадает в ключ (защита кеша от мусорных query)', () => {
+    expect(splitPageUrl('/?foo=1&bar=2')).toEqual({ url: '/', dropped: 'foo=1&bar=2' })
   })
 })
 

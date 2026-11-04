@@ -28,7 +28,7 @@ cp .env.example .env
 | `NUXT_PUBLIC_SITE_URL` | Домен сайта для canonical, hreflang и og:url |
 | `NUXT_BFF_SECRET` | = `BRANDED_BFF_SECRET` в `wp-config.php`: WP доверяет IP покупателя из BFF (rate limit заказов) |
 | `NUXT_REVALIDATE_SECRET` | = `BRANDED_REVALIDATE_SECRET` в `wp-config.php`: вебхук сброса кеша `POST /api/_revalidate` |
-| `NUXT_REDIS_URL` | Кеш Nitro в Redis, общий для всех инстансов, например `redis://127.0.0.1:6379/1`. Пусто — кеш в памяти процесса |
+| `NUXT_REDIS_URL` | Кеш API и HTML в Redis, общий для всех инстансов, например `redis://127.0.0.1:6379/1`. Пусто — кеш в памяти процесса |
 | `NUXT_PUBLIC_GTM_ID`, `NUXT_PUBLIC_FB_PIXEL_ID` | Аналитика. Задаются только на проде |
 
 > **Внимание.** Если `NUXT_WP_SITE_URL` указывает на прод (`https://branded.com.ua`), то заказы, отзывы и подписки из локального фронта настоящие: письма клиенту и админу, сообщения в Telegram, списание остатков.
@@ -45,16 +45,19 @@ cp .env.example .env
 | `npm test` | unit-тесты (Vitest): проекты `unit` (чистые функции, Node) и `nuxt` (composables и стор в окружении Nuxt) |
 | `npm run test:unit` | только проект `unit`, без запуска Nuxt (около секунды) |
 | `npm run test:e2e` | E2E-смоук (Playwright) против production-сборки: сначала `npm run build` |
+| `npm run compare-urls -- --target <url>` | сверка SEO с живым сайтом по sitemap: статус, canonical, hreflang, title, H1, robots, картинки, JSON-LD (`scripts/compare-urls.mjs`, справка — `--help`) |
 
 ## Тесты и CI
 
 - **Unit** лежат в `test/unit/` и `test/nuxt/`: редиректы, нормализация query каталога, позиции корзины для WP, телефон, выбор вариации, ключ позиции корзины, пути, разбор ответа `create_order`.
 - **E2E** лежат в `test/e2e/`:
   - сценарий покупателя: главная → категория → фильтр → товар → корзина → checkout с ошибкой поля (заказ не отправляется);
-  - SSR-проверка `<head>` и статусов: canonical, hreflang, robots, H1, пагинация, UTM, `noindex` служебных страниц, 301 и 404.
+  - SSR-проверка `<head>` и статусов: canonical, hreflang, robots, H1, пагинация, UTM, `noindex` служебных страниц, 301 и 404;
+  - кеш HTML (одна запись для разных меток рекламы, меток нет в HTML и они остаются в адресе браузера, служебные страницы не кешируются) и заголовки безопасности.
 
   Playwright сам запускает `.output/server/index.mjs` на порту 3100 и ходит в WP по адресу `E2E_WP_URL`, по умолчанию локальный `http://branded.loc` (нужен запущенный OSPanel). Против staging: `E2E_BASE_URL=https://staging…`. Браузер — `npx playwright install chromium` один раз или установленный Chrome через `E2E_CHANNEL=chrome`. Регулярно против прода не запускать.
 - **CI** (`.github/workflows/ci.yml`) на каждый push и pull request: `npm ci`, `nuxi typecheck`, `npm test`, `npm run build`. E2E в CI появятся вместе со staging.
+- **Деплой** (`.github/workflows/deploy.yml`) на VPS: сборка в Actions, загрузка `.output` по rsync и серверный `branded-deploy` (релиз, симлинк, `pm2 reload`, проверка, откат), затем сброс кеша API. Пока не задана переменная `DEPLOY_HOST`, workflow пропускается. Настройка — [deploy/README.md](deploy/README.md), сам сервер — [docs/vps-setup-2026-11-03](docs/vps-setup-2026-11-03/README.ru.md).
 - npm 11 не запускает install-скрипты пакетов без разрешения. Для `esbuild`, `@parcel/watcher` и `vue-demi` они явно запрещены (`allowScripts` в `package.json`): все три работают и без скриптов. Новый пакет со скриптом npm покажет в `npm install-scripts ls`.
 
 ### Особенности Windows
@@ -72,6 +75,9 @@ cp .env.example .env
 | `app/stores/cart.ts` | корзина (Pinia, хранится в `localStorage`) |
 | `server/api/` | BFF: проверка входа и проксирование в WP, вебхук сброса кеша |
 | `server/plugins/cache-storage.ts` | хранилище кеша Nitro: Redis или LRU в памяти |
+| `server/plugins/html-cache.ts` | кеш HTML страниц: ключ без меток рекламы, stale-while-revalidate |
+| `scripts/` | сверка SEO с живым сайтом по sitemap |
+| `deploy/` | как устроен деплой из GitHub Actions на VPS и что настроить на сервере |
 | `shared/utils/` | код для фронта и сервера сразу: нормализация query каталога (без `utm_*`, `gclid`) |
 | `server/middleware/` | 301-редиректы со старых URL WordPress (правила — `server/utils/redirects.ts`), прокси sitemap Yoast |
 | `test/` | `unit/`, `nuxt/` — Vitest; `e2e/` — Playwright |

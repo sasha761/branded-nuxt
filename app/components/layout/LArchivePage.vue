@@ -130,7 +130,7 @@ const archiveTitle = computed(() => {
 
   const category = productsData.value?.product_cat
   if (category?.name) {
-    return category.parent ? `${category.parent}. ${category.name}` : category.name
+    return category.name
   }
 
   return term.value?.name ?? ''
@@ -164,7 +164,9 @@ function filterCallback(selectedOption) {
     query[selectedOption.type] = selectedOption.key
   }
 
-  router.push({ query })
+  // path явно, как в CPagination: без него vue-router собирает путь из параметров [...slug]
+  // и даёт /product-category/mans//?brand=… — WP по такому адресу отдаёт чужую выдачу.
+  router.push({ path: route.path, query })
 }
 </script>
 

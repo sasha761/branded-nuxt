@@ -1,0 +1,89 @@
+# Деплой Nuxt на VPS (docs/vps-setup-2026-11-03): сборка здесь → rsync .output в /srv/branded/incoming/<release>
+# → серверный branded-deploy (проверка API WP, новый релиз, симлинк current, pm2 reload, проверка HTTP, откат при ошибке)
+# → сброс кеша API через вебхук. Подготовка сервера и GitHub — deploy/README.md.
+#
+# Когда запускается:
+# - вручную: Actions → Deploy → Run workflow (только master);
+# - после зелёного CI на push в master, если переменная DEPLOY_ON_PUSH = true.
+# Пока переменная DEPLOY_HOST не задана, job пропускается.
+name: Deploy
+
+on:
+  workflow_dispatch:
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
+    branches: [master]
+
+# Деплои по очереди, начатый не прерывается
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    if: >-
+      vars.DEPLOY_HOST != '' && (
+        (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/master') ||
+        (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success'
+          && github.event.workflow_run.event == 'push' && vars.DEPLOY_ON_PUSH == 'true')
+      )
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    environment: production
+    env:
+      # workflow_run — коммит, который прошёл CI, а не текущая голова master
+      SHA: ${{ github.event.workflow_run.head_sha || github.sha }}
+      TARGET: ${{ vars.DEPLOY_USER }}@${{ vars.DEPLOY_HOST }}
+      INCOMING: /srv/branded/incoming
+
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ env.SHA }}
+
+      # Та же мажорная версия, что на сервере (/opt/branded/node, 22.x)
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      # Переменные окружения сборке не нужны: всё читается при запуске (/etc/branded/nuxt.env.json на сервере)
+      - run: npm run build
+
+      - name: SSH-ключ
+        env:
+          SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+          KNOWN_HOSTS: ${{ secrets.DEPLOY_KNOWN_HOSTS }}
+        run: |
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "$SSH_KEY" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          printf '%s\n' "$KNOWN_HOSTS" > ~/.ssh/known_hosts
+
+      # branded-deploy не перезаписывает существующий релиз: ID уникален для каждого запуска
+      - name: Загрузить сборку
+        run: |
+          RELEASE="${SHA::12}-${{ github.run_number }}-${{ github.run_attempt }}"
+          echo "RELEASE=$RELEASE" >> "$GITHUB_ENV"
+          ssh "$TARGET" "mkdir -p '$INCOMING/$RELEASE/.output'"
+          rsync -az --delete .output/ "$TARGET:$INCOMING/$RELEASE/.output/"
+
+      - name: Включить релиз
+        run: ssh "$TARGET" "sudo -n /usr/local/sbin/branded-deploy '$INCOMING/$RELEASE' '$RELEASE' && rm -rf '$INCOMING/$RELEASE'"
+
+      # Кеш HTML после деплоя и так рендерится заново (buildId в ключе), а ответы API могли сменить формат.
+      # Секрет идёт через stdin (curl -H @-), а не в командной строке на сервере.
+      - name: Сбросить кеш
+        env:
+          REVALIDATE_SECRET: ${{ secrets.NUXT_REVALIDATE_SECRET }}
+        run: |
+          if [ -z "$REVALIDATE_SECRET" ]; then
+            echo 'NUXT_REVALIDATE_SECRET не задан — кеш API не сброшен'
+            exit 0
+          fi
+          printf 'x-branded-secret: %s\n' "$REVALIDATE_SECRET" | ssh "$TARGET" \
+            "curl -fsS --max-time 60 -X POST -H @- -H 'content-type: application/json' \
+              -d '{\"scopes\":[\"catalog\",\"seo\",\"menu\",\"home\"]}' http://127.0.0.1:3000/api/_revalidate"

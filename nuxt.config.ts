@@ -5,9 +5,21 @@ import { fileURLToPath } from 'node:url'
 // Только GET-маршруты: кешированный обработчик Nitro не передаёт тело запроса, POST под таким правилом ломается.
 const apiCache = (maxAge: number) => ({ cache: { maxAge, staleMaxAge: 3600 } })
 
+// Кеш HTML страниц — не здесь, а в server/plugins/html-cache.ts (ключ без меток рекламы).
+
 // Служебные маршруты фронта: в поиске им делать нечего.
 const noindex = { headers: { 'X-Robots-Tag': 'noindex, nofollow' } }
 const noindexFollow = { headers: { 'X-Robots-Tag': 'noindex, follow' } }
+
+// Базовые заголовки безопасности для всех ответов (S-b). HSTS ставит nginx: там TLS (deploy/nginx).
+// Полный CSP пока не задан: GTM, пиксель и встроенные скрипты Nuxt требуют отдельной настройки.
+const securityHeaders = {
+  'X-Content-Type-Options': 'nosniff',
+  'Referrer-Policy': 'strict-origin-when-cross-origin',
+  'X-Frame-Options': 'SAMEORIGIN',
+  'Content-Security-Policy': 'frame-ancestors \'self\'',
+  'Permissions-Policy': 'camera=(), microphone=(), geolocation=()',
+}
 
 export default defineNuxtConfig({
   compatibilityDate: '2025-05-01',
@@ -87,6 +99,7 @@ export default defineNuxtConfig({
     // Кеш API — только в production-сборке. В dev кеш Nitro лежит на диске (.nuxt/cache) и переживает
     // перезапуск: после смены NUXT_WP_SITE_URL или правки в админке отдавались бы старые ответы.
     // ($production в конфиге не подходит: nuxi build читает конфиг до установки NODE_ENV.)
+    // Правила cache/swr для страниц здесь не ставить: '/**' при слиянии правил добавил бы swr кешу API.
     'nitro:config'(nitroConfig) {
       if (nitroConfig.dev) {
         return
@@ -107,6 +120,7 @@ export default defineNuxtConfig({
   },
 
   routeRules: {
+    '/**': { headers: securityHeaders },
     '/cart/**': noindex,
     '/uk/cart/**': noindex,
     '/checkout/**': noindex,

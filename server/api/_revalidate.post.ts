@@ -14,7 +14,8 @@ const SCOPE_PREFIXES: Record<string, string[]> = {
   home: ['apihome'],
 }
 
-const CACHE_BASES = ['nitro:routes', 'nitro:handlers']
+// nitro:pages — кеш HTML страниц (server/plugins/html-cache.ts), имя записи — hex-хеш
+const CACHE_BASES = ['nitro:routes', 'nitro:handlers', 'nitro:pages']
 
 function isValidSecret(received: string, expected: string) {
   const a = Buffer.from(received)
@@ -41,25 +42,27 @@ export default defineEventHandler(async (event) => {
 
   const prefixes = scopes.flatMap(scope => SCOPE_PREFIXES[scope] || [])
   const storage = useStorage('cache')
-  let removed = 0
+  const apiKeys: string[] = []
+  const htmlKeys: string[] = []
 
   for (const base of CACHE_BASES) {
-    const keys = await storage.getKeys(base)
-
-    for (const key of keys) {
+    for (const key of await storage.getKeys(base)) {
       const name = key.split(':').pop() || ''
       const pathPart = name.split('.')[0] || ''
-      // HTML страниц (если включён кеш страниц) содержит всё сразу: меню, цены, SEO.
-      const matches = pathPart.startsWith('api')
-        ? prefixes.some(prefix => pathPart.startsWith(prefix))
-        : true
 
-      if (matches) {
-        await storage.removeItem(key)
-        removed++
+      if (!pathPart.startsWith('api')) {
+        // HTML страниц содержит всё сразу (меню, цены, SEO): сбрасывается при любом scope.
+        htmlKeys.push(key)
+      } else if (prefixes.some(prefix => pathPart.startsWith(prefix))) {
+        apiKeys.push(key)
       }
     }
   }
 
-  return { ok: true, scopes, removed }
+  // Сначала ответы API, потом HTML: иначе страница, отрисованная в промежутке,
+  // снова попала бы в кеш со старыми данными из ещё не удалённого ответа API.
+  await Promise.all(apiKeys.map(key => storage.removeItem(key)))
+  await Promise.all(htmlKeys.map(key => storage.removeItem(key)))
+
+  return { ok: true, scopes, removed: apiKeys.length + htmlKeys.length }
 })

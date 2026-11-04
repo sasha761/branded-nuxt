@@ -1,0 +1,142 @@
+# Stage B: headless cutover AFTER Stage A and staging verification.
+# INACTIVE TEMPLATE. Requires TLS for branded/www and cms plus admin.htpasswd.
+# Keep the Stage A template for rollback.
+server {
+    listen 80;
+    server_name branded.com.ua www.branded.com.ua;
+    location ^~ /.well-known/acme-challenge/ { root /srv/branded/acme; }
+    location / { return 301 https://branded.com.ua$request_uri; }
+}
+server {
+    listen 80;
+    server_name cms.branded.com.ua;
+    location ^~ /.well-known/acme-challenge/ { root /srv/branded/acme; }
+    location / { return 301 https://cms.branded.com.ua$request_uri; }
+}
+server {
+    listen 443 ssl;
+    server_name www.branded.com.ua;
+    ssl_certificate /etc/branded/tls/branded/fullchain.pem;
+    ssl_certificate_key /etc/branded/tls/branded/privkey.pem;
+    return 301 https://branded.com.ua$request_uri;
+}
+server {
+    listen 443 ssl;
+    server_name branded.com.ua;
+    ssl_certificate /etc/branded/tls/branded/fullchain.pem;
+    ssl_certificate_key /etc/branded/tls/branded/privkey.pem;
+    ssl_protocols TLSv1.2 TLSv1.3;
+    root /srv/branded/wordpress;
+    client_max_body_size 64m;
+    access_log /var/log/branded/public-access.log;
+    error_log /var/log/branded/public-error.log;
+    add_header X-Content-Type-Options nosniff always;
+    add_header Referrer-Policy strict-origin-when-cross-origin always;
+    add_header Content-Security-Policy "frame-ancestors 'self';" always;
+    add_header Strict-Transport-Security "max-age=31536000" always;
+    location ~ /\. { deny all; }
+    location = /xmlrpc.php { return 403; }
+    location = /wp-cron.php { return 403; }
+    location ~* ^/wp-content/.*\.(?:php[0-9]*|phtml|phar)(?:/|$) { return 403; }
+    location /wp-content/uploads/ {
+        alias /srv/branded/wordpress/wp-content/uploads/;
+        expires 30d;
+        access_log off;
+    }
+    location /_nuxt/ {
+        alias /srv/branded/nuxt/current/.output/public/_nuxt/;
+        expires 365d;
+        access_log off;
+    }
+    location /wp-json/ {
+        include fastcgi_params;
+        fastcgi_param SCRIPT_FILENAME /srv/branded/wordpress/index.php;
+        fastcgi_param SCRIPT_NAME /index.php;
+        fastcgi_param HTTPS on;
+        fastcgi_param SERVER_PORT 443;
+        fastcgi_read_timeout 120s;
+        fastcgi_pass unix:/run/branded-php/php-fpm.sock;
+    }
+    location ~ ^/(?:uk/)?(?:sitemap_index\.xml|(?:[^/]+-)?sitemap[0-9]*\.xml|main-sitemap\.xsl)$ {
+        include fastcgi_params;
+        fastcgi_param SCRIPT_FILENAME /srv/branded/wordpress/index.php;
+        fastcgi_param SCRIPT_NAME /index.php;
+        fastcgi_param HTTPS on;
+        fastcgi_param SERVER_PORT 443;
+        fastcgi_pass unix:/run/branded-php/php-fpm.sock;
+    }
+    location = /wp-login.php { return 302 https://cms.branded.com.ua$request_uri; }
+    location /wp-admin/ { return 302 https://cms.branded.com.ua$request_uri; }
+    location ~ \.php(?:/|$) { return 404; }
+    error_page 418 = @wordpress_callback;
+    location @wordpress_callback {
+        include fastcgi_params;
+        fastcgi_param SCRIPT_FILENAME /srv/branded/wordpress/index.php;
+        fastcgi_param SCRIPT_NAME /index.php;
+        fastcgi_param HTTPS on;
+        fastcgi_param SERVER_PORT 443;
+        fastcgi_pass unix:/run/branded-php/php-fpm.sock;
+    }
+    location / {
+        if ($args ~* "(^|&)wc-api=") { return 418; }
+        proxy_pass http://127.0.0.1:3000;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $remote_addr;
+        proxy_set_header X-Forwarded-Proto https;
+        proxy_set_header Connection "";
+        proxy_read_timeout 60s;
+    }
+}
+server {
+    listen 443 ssl;
+    server_name cms.branded.com.ua;
+    ssl_certificate /etc/branded/tls/cms/fullchain.pem;
+    ssl_certificate_key /etc/branded/tls/cms/privkey.pem;
+    ssl_protocols TLSv1.2 TLSv1.3;
+    root /srv/branded/wordpress;
+    index index.php;
+    client_max_body_size 64m;
+    access_log /var/log/branded/cms-access.log;
+    error_log /var/log/branded/cms-error.log;
+    add_header X-Content-Type-Options nosniff always;
+    add_header Referrer-Policy strict-origin-when-cross-origin always;
+    add_header Content-Security-Policy "frame-ancestors 'self';" always;
+    add_header Strict-Transport-Security "max-age=31536000" always;
+    add_header X-Robots-Tag "noindex, nofollow" always;
+    location ~ /\. { deny all; }
+    location = /wp-config.php { deny all; }
+    location = /xmlrpc.php { return 403; }
+    location = /wp-cron.php { return 403; }
+    location ~* ^/wp-content/.*\.(?:php[0-9]*|phtml|phar)(?:/|$) { return 403; }
+    location /wp-json/ {
+        include fastcgi_params;
+        fastcgi_param SCRIPT_FILENAME /srv/branded/wordpress/index.php;
+        fastcgi_param SCRIPT_NAME /index.php;
+        fastcgi_param HTTPS on;
+        fastcgi_param SERVER_PORT 443;
+        fastcgi_pass unix:/run/branded-php/php-fpm.sock;
+    }
+    # Regex locations with PHP must precede the general admin prefix location.
+    location ~ ^/(?:wp-login\.php|wp-admin/.*\.php)$ {
+        auth_basic "Branded administration";
+        auth_basic_user_file /etc/branded/admin.htpasswd;
+        try_files $uri =404;
+        include fastcgi_params;
+        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+        fastcgi_param HTTPS on;
+        fastcgi_param SERVER_PORT 443;
+        fastcgi_read_timeout 120s;
+        fastcgi_pass unix:/run/branded-php/php-fpm.sock;
+    }
+    location /wp-admin/ {
+        auth_basic "Branded administration";
+        auth_basic_user_file /etc/branded/admin.htpasswd;
+        try_files $uri $uri/ /wp-admin/index.php?$args;
+    }
+    location /wp-content/ { try_files $uri =404; }
+    location /wp-includes/ { try_files $uri =404; }
+    location ~ \.php(?:/|$) { return 404; }
+    location / { return 301 https://branded.com.ua$request_uri; }
+}
