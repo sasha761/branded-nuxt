@@ -56,15 +56,15 @@ jobs:
       - run: npm ci --no-audit --no-fund
       - run: npx nuxi typecheck
       - run: npm test
-      - run: npm run build
-
       - name: Identify artifact
         shell: bash
         run: |
           set -euo pipefail
           RELEASE="${SHA::12}-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
           echo "RELEASE=$RELEASE" >> "$GITHUB_ENV"
-          node --input-type=module -e 'import fs from "node:fs"; fs.writeFileSync(".output/public/deploy-meta.json", JSON.stringify({sha:process.env.SHA,run:process.env.GITHUB_RUN_ID,attempt:process.env.GITHUB_RUN_ATTEMPT}));'
+          node --input-type=module -e 'import fs from "node:fs"; fs.writeFileSync("public/deploy-meta.json", JSON.stringify({sha:process.env.SHA,run:process.env.GITHUB_RUN_ID,attempt:process.env.GITHUB_RUN_ATTEMPT}));'
+
+      - run: npm run build
 
       - name: Set up SSH
         env:
