@@ -6,6 +6,8 @@
       alt="Branded background"
       width="1920"
       height="990"
+      loading="lazy"
+      decoding="async"
     >
     <div class="u-container">
       <h2 class="u-h2">{{ $t('home.best_offers') }}</h2>

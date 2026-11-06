@@ -7,7 +7,3 @@
     </div>
   </div>
 </template>
-
-<style lang="scss">
-@import "~/assets/scss/components/page-loader.scss";
-</style>

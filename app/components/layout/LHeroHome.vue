@@ -19,6 +19,7 @@
                     :alt="$t('home.banner_alt', { n: index + 1 })"
                     :fetchpriority="index === 0 ? 'high' : 'low'"
                     :loading="index === 0 ? 'eager' : 'lazy'"
+                    decoding="async"
                   >
                 </picture>
                 <!-- Как в теме WP: H1 в последнем слайде, текст на языке страницы -->
@@ -40,6 +41,8 @@
                   width="360"
                   height="234"
                   :alt="$t('home.small_banner_1_alt')"
+                  loading="lazy"
+                  decoding="async"
                 >
               </picture>
             </NuxtLink>
@@ -50,6 +53,8 @@
                   width="360"
                   height="234"
                   :alt="$t('home.small_banner_2_alt')"
+                  loading="lazy"
+                  decoding="async"
                 >
               </picture>
             </NuxtLink>

@@ -9,12 +9,12 @@
           <div class="row">
             <div class="col-lg-6">
               <NuxtLink :to="siteLink('accessories')" class="c-outlet">
-                <img src="~/assets/img/bags1.jpg" alt="bags branded" width="400" height="400">
+                <img src="~/assets/img/bags1.jpg" alt="bags branded" width="400" height="400" loading="lazy" decoding="async">
               </NuxtLink>
             </div>
             <div class="col-lg-6">
               <NuxtLink :to="siteLink('accessories')" class="c-outlet">
-                <img src="~/assets/img/bags2.jpg" alt="bags branded" width="400" height="400">
+                <img src="~/assets/img/bags2.jpg" alt="bags branded" width="400" height="400" loading="lazy" decoding="async">
               </NuxtLink>
             </div>
           </div>
@@ -53,7 +53,7 @@
                   class="c-outlet"
                 >
                   <picture>
-                    <img :src="outlet.post_img_m" :alt="outlet.name" width="400" height="440">
+                    <img :src="outlet.post_img_m" :alt="outlet.name" width="400" height="440" loading="lazy" decoding="async">
                   </picture>
                 </NuxtLink>
               </div>

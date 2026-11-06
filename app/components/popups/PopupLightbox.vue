@@ -15,7 +15,7 @@
               autoplay
               loop
             ></video>
-            <img v-else :src="item.src" :alt="alt">
+            <img v-else :src="item.src" :alt="alt" :loading="index === initialSlide ? 'eager' : 'lazy'" decoding="async">
           </div>
         </div>
       </div>
@@ -59,13 +59,14 @@ const mediaItems = (props.data?.images || [])
 // Как в теме: обложка видео — фото товара
 const poster = mediaItems.find(item => !item.video)?.src
 const alt = props.data?.alt || ''
+const initialSlide = props.data?.slideKey || 0
 
 onMounted(() => {
   swiperInstance = new Swiper(sliderEl.value, {
     modules: [Navigation, Pagination, Zoom],
     watchOverflow: true,
     zoom: true,
-    initialSlide: props.data?.slideKey || 0,
+    initialSlide,
     // Стрелки видны с 576px (d-sm-block), на телефоне — свайп и точки
     navigation: {
       nextEl: nextEl.value,

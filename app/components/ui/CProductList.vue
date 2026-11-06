@@ -10,6 +10,7 @@
           <UiCProduct
             :product="product"
             :eager="index < 4"
+            :priority="index === 0"
             @select="analytics.selectItem(product, index, listContext)"
           />
         </div>

@@ -38,7 +38,7 @@
                           :width="image.width"
                           :height="image.height"
                           :fetchpriority="index === 0 ? 'high' : undefined"
-                          :loading="index === 0 ? undefined : 'lazy'"
+                          :loading="index === 0 ? 'eager' : 'lazy'"
                           :decoding="index === 0 ? undefined : 'async'"
                         >
                       </picture>
@@ -161,7 +161,7 @@
                 <div v-if="product.specs?.sku">
                   <span>{{ t('sku') }}: </span> <span>{{ product.specs.sku }}</span>
                 </div>
-                <div v-html="product.description"></div>
+                <div v-html="withLazyImages(product.description)"></div>
               </div>
 
               <div class="l-product__info" v-if="accordionItems.length">

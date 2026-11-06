@@ -2,8 +2,11 @@
 @import 'utility/style.scss';
 @import 'base/style.scss';
 @import 'components/style.scss';
+@import 'components/loading-spinner.scss';
+@import 'components/page-loader.scss';
 @import 'layout/style.scss';
 @import 'page/style.scss';
+@import 'page/error.scss';
 
 
 img.lazy {

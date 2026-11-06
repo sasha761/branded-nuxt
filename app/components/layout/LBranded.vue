@@ -1,6 +1,6 @@
 <template>
   <section class="l-branded">
-    <div class="l-branded__img d-lg-block d-none" :style="{ 'background-image': `url(${brandedBgImg})` }"></div>
+    <img class="l-branded__img d-lg-block d-none" :src="brandedBgImg" alt="" loading="lazy" decoding="async">
 
     <div class="u-container">
       <div class="l-branded__content">
@@ -27,28 +27,28 @@
             <div class="col-lg-3 col-md-3 col-6 u-col">
               <div class="c-product">
                 <div class="c-product__img">
-                  <img src="~/assets/img/223.png" alt="branded product" width="300" height="450">
+                  <img src="~/assets/img/223.png" alt="branded product" width="300" height="450" loading="lazy" decoding="async">
                 </div>
               </div>
             </div>
             <div class="col-lg-3 col-md-3 col-6 u-col">
               <div class="c-product">
                 <div class="c-product__img">
-                  <img src="~/assets/img/224.png" alt="branded product" width="300" height="450">
+                  <img src="~/assets/img/224.png" alt="branded product" width="300" height="450" loading="lazy" decoding="async">
                 </div>
               </div>
             </div>
             <div class="col-lg-3 col-md-3 col-6 u-col">
               <div class="c-product">
                 <div class="c-product__img">
-                  <img src="~/assets/img/225.png" alt="branded product" width="300" height="450">
+                  <img src="~/assets/img/225.png" alt="branded product" width="300" height="450" loading="lazy" decoding="async">
                 </div>
               </div>
             </div>
             <div class="col-lg-3 col-md-3 col-6 u-col">
               <div class="c-product">
                 <div class="c-product__img">
-                  <img src="~/assets/img/2221.png" alt="branded product" width="300" height="450">
+                  <img src="~/assets/img/2221.png" alt="branded product" width="300" height="450" loading="lazy" decoding="async">
                 </div>
               </div>
             </div>

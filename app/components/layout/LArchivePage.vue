@@ -15,7 +15,7 @@
               <div
                 class="js-read-more-text"
                 :class="isReadMoreOpen ? 'is-open' : 'is-close'"
-                v-html="description"
+                v-html="withLazyImages(description)"
               ></div>
               <button type="button" class="u-read-more js-read-more-btn" :class="{ 'is-open': isReadMoreOpen }" @click="isReadMoreOpen = !isReadMoreOpen">
                 {{ isReadMoreOpen ? t('Read less') : t('Read completely') }}

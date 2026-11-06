@@ -23,6 +23,8 @@
                 :title="item.title"
                 width="95"
                 height="95"
+                loading="lazy"
+                decoding="async"
               >
             </picture>
           </NuxtLink>

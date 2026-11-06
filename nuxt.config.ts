@@ -75,6 +75,11 @@ export default defineNuxtConfig({
 
   css: ['~/assets/scss/main.scss'],
 
+  // Встраиваем стили первого рендера, включая глобальный CSS, в SSR HTML.
+  features: {
+    inlineStyles: true,
+  },
+
   vite: {
     optimizeDeps: {
       include: [

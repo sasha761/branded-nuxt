@@ -92,12 +92,13 @@ export function usePageSeo(pageRoute: MaybeRefOrGetter<PageRoute | null | undefi
       }
     }
 
-    // Без перевода отдельный набор hreflang не нужен; переключатель языка
-    // по-прежнему получает полный info.alternates выше.
+    // Одноязычный архив WooCommerce Brands повторяет head живого сайта.
+    // Товары сохраняют все альтернативы API, включая self и x-default.
     const translatedLanguages = new Set((info.alternates || [])
       .filter(alternate => alternate.lang !== 'x-default')
       .map(alternate => alternate.lang))
-    if (page <= 1 && translatedLanguages.size > 1) {
+    const omitBrandAlternates = info.taxonomy === 'product_brand' && translatedLanguages.size < 2
+    if (page <= 1 && !omitBrandAlternates) {
       for (const alternate of info.alternates || []) {
         link.push({
           rel: 'alternate',

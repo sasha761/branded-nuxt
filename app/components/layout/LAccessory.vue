@@ -14,6 +14,8 @@
             alt="accessory background"
             height="830"
             width="825"
+            loading="lazy"
+            decoding="async"
           >
           <NuxtLink :to="siteLink('accessories')" class="c-circle">
             <svg width="61px" height="19px" class="c-circle__arrow">
@@ -24,6 +26,8 @@
               alt="circle image"
               width="251"
               height="251"
+              loading="lazy"
+              decoding="async"
             >
           </NuxtLink>
         </div>
@@ -48,6 +52,8 @@
             :alt="item.title || $t('home.accessories_alt')"
             height="300"
             :width="index === 0 ? 300 : (index === 1 ? 330 : 300)"
+            loading="lazy"
+            decoding="async"
           >
         </picture>
       </NuxtLink>

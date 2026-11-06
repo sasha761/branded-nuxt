@@ -21,7 +21,7 @@
             <template v-else>{{ row.value }}</template>
           </p>
         </template>
-        <div v-else v-html="item.html"></div>
+        <div v-else v-html="withLazyImages(item.html)"></div>
       </div>
     </div>
   </div>

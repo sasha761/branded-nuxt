@@ -16,6 +16,13 @@ ENV = dict(os.environ, PM2_HOME='/srv/branded/.pm2', PATH='/opt/branded/node/bin
 def reload():
     subprocess.run(['/usr/sbin/runuser', '-u', 'branded', '--', '/opt/branded/node/bin/pm2', 'reload', '/etc/branded/ecosystem.config.cjs', '--env', 'production', '--update-env'], env=ENV, check=True)
 
+def sync_assets(release):
+    assets = release/'.output/public/_nuxt'
+    if assets.is_dir():
+        shared = BASE/'assets/_nuxt'
+        shared.mkdir(parents=True, exist_ok=True)
+        subprocess.run(['rsync', '-a', '--safe-links', '--chmod=D755,F644', '--chown=branded:branded', str(assets)+'/', str(shared)+'/'], check=True)
+
 def point(name, destination):
     temporary = BASE/(name+'.next')
     temporary.unlink(missing_ok=True)
@@ -51,6 +58,7 @@ else:
     target.mkdir(mode=0o755)
     subprocess.run(['rsync', '-a', '--chown=branded:branded', str(source/'.output')+'/', str(target/'.output')+'/'], check=True)
     subprocess.run(['chmod', '-R', 'u=rwX,go=rX', str(target)], check=True)
+sync_assets(target)
 point('current', target)
 try:
     reload()
@@ -65,6 +73,7 @@ try:
                 raise
             time.sleep(2)
 except Exception:
+    sync_assets(old)
     point('current', old)
     reload()
     raise

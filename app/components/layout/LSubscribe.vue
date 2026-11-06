@@ -7,6 +7,7 @@
       width="1920"
       height="647"
       loading="lazy"
+      decoding="async"
     />
     <div class="u-container">
       <form class="c-form js-form-register" novalidate @submit.prevent="submit">

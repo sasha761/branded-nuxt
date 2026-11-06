@@ -40,7 +40,7 @@
         <div class="col-lg-9 col-md-9 col-12 u-col">
           <div class="p-page__content">
             <h1 class="p-page__title u-h2">{{ content.page?.title }}</h1>
-            <div class="p-page__content-text" v-html="content.page?.content"></div>
+            <div class="p-page__content-text" v-html="withLazyImages(content.page?.content)"></div>
           </div>
         </div>
       </div>

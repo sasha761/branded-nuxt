@@ -13,7 +13,7 @@
         :to="product.path"
         class="c-product-cart__img"
       >
-        <img :src="product.post_img_m" :alt="product.name" />
+        <img :src="product.post_img_m" :alt="product.name" loading="lazy" decoding="async" />
       </NuxtLink>
 
       <div class="c-product-cart__info">

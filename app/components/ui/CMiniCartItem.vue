@@ -2,7 +2,7 @@
   <div class="c-minicart-product">
     <div class="c-minicart-product__img">
       <NuxtLink :to="product.path">
-        <img :src="imageSrc" :alt="product.name" width="70" height="84" loading="lazy">
+        <img :src="imageSrc" :alt="product.name" width="70" height="84" loading="lazy" decoding="async">
       </NuxtLink>
     </div>
 

@@ -28,6 +28,7 @@
           :width="cardImage.width"
           :height="cardImage.height"
           :loading="eager ? 'eager' : 'lazy'"
+          :fetchpriority="priority ? 'high' : undefined"
           decoding="async"
         />
         <span v-if="product.percent" class="c-product__sale">-{{ product.percent }}%</span>
@@ -55,6 +56,7 @@ const props = defineProps({
   isBrand: { type: Boolean, default: false },
   // Первые карточки в видимой области грузятся сразу (LCP архива)
   eager: { type: Boolean, default: false },
+  priority: { type: Boolean, default: false },
 })
 
 const emit = defineEmits(['select'])

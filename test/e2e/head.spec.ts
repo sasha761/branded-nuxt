@@ -75,6 +75,33 @@ test.describe('SEO и статусы SSR', () => {
     expectIndexable(await head(request, '/uk/'), '/uk/', 'uk-UA')
   })
 
+  test('товар сохраняет hreflang из API, включая одноязычные варианты', async ({ request }) => {
+    const path = '/product/kostyum-z-trohnitki-z-velyurovim-efektom-vid-volana/'
+    const response = await request.get('/api/route', { params: { path } })
+    test.skip(response.status() === 404, 'Товар-фикстура отсутствует в этой копии базы')
+    expect(response.status()).toBe(200)
+    const info = await response.json()
+    expect(info.type).toBe('product')
+    expect(info.alternates.length).toBeGreaterThan(0)
+    const page = await head(request, path)
+    expect(page.status).toBe(200)
+    const expected = Object.fromEntries(info.alternates.map((entry: { lang: string, path: string }) => [entry.lang, pathOf(entry.path)]))
+    expect(Object.fromEntries(Object.entries(page.alternates).map(([lang, url]) => [lang, pathOf(url)]))).toEqual(expected)
+  })
+
+  test('одноязычный архив WooCommerce Brands не добавляет hreflang', async ({ request }) => {
+    const path = '/бренд/suns-house/'
+    const response = await request.get('/api/route', { params: { path } })
+    test.skip(response.status() === 404, 'Бренд-фикстура отсутствует в этой копии базы')
+    expect(response.status()).toBe(200)
+    const info = await response.json()
+    expect(info.taxonomy).toBe('product_brand')
+    test.skip(new Set(info.alternates.filter((entry: { lang: string }) => entry.lang !== 'x-default').map((entry: { lang: string }) => entry.lang)).size > 1, 'У бренда появился перевод')
+    const page = await head(request, path)
+    expect(page.status).toBe(200)
+    expect(page.alternates).toEqual({})
+  })
+
   test('категория и её uk-перевод', async ({ request }) => {
     const ru = await head(request, category)
     expectIndexable(ru, category, 'ru-RU')

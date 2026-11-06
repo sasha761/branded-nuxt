@@ -45,7 +45,3 @@ function handleGoHome() {
   clearError({ redirect: localePath('/') })
 }
 </script>
-
-<style lang="scss">
-@import "~/assets/scss/page/error.scss";
-</style>
