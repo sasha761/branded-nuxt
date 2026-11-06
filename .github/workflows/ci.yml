@@ -20,8 +20,8 @@ jobs:
 
       - uses: actions/setup-node@v5
         with:
-          # Nuxt 4.6 требует Node ^22.22.3 или ^24.15
-          node-version: 24
+          # Та же версия Node, что на VPS и в Deploy.
+          node-version: 26.13.0
           cache: npm
 
       # postinstall выполняет nuxt prepare (типы и .nuxt для typecheck и тестов)
