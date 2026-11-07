@@ -13,7 +13,8 @@
               >
                 <picture>
                   <img
-                    :src="item.img"
+                    :src="loadedBannerIndexes.has(index) ? item.img : undefined"
+                    :data-src="index > 0 ? item.img : undefined"
                     width="1400"
                     height="616"
                     :alt="$t('home.banner_alt', { n: index + 1 })"
@@ -74,6 +75,9 @@ const props = defineProps({
 
 const siteLink = useSiteLink()
 const bannerSlider = ref(null)
+// Одного loading="lazy" недостаточно: браузер заранее загружает соседние слайды.
+// Реальный src появляется только у первого и уже открытых баннеров.
+const loadedBannerIndexes = ref(new Set([0]))
 let swiperInstance = null
 
 const firstBannerImg = computed(() => props.data?.banners?.[0]?.img)
@@ -85,9 +89,18 @@ useHead({
   ),
 })
 
+function loadActiveBanner(swiper) {
+  loadedBannerIndexes.value.add(swiper.activeIndex)
+}
+
 onMounted(() => {
   if (bannerSlider.value) {
-    swiperInstance = new Swiper(bannerSlider.value)
+    swiperInstance = new Swiper(bannerSlider.value, {
+      on: {
+        init: loadActiveBanner,
+        slideChange: loadActiveBanner,
+      },
+    })
   }
 })
 
