@@ -1,6 +1,6 @@
 <template>
   <section class="l-branded">
-    <UiCImage class="l-branded__img d-lg-block d-none" :src="brandedBgImg" alt="" loading="lazy" decoding="async" />
+    <img class="l-branded__img d-lg-block d-none" :src="brandedBgImg" alt="" loading="lazy" decoding="async">
 
     <div class="u-container">
       <div class="l-branded__content">
@@ -27,28 +27,28 @@
             <div class="col-lg-3 col-md-3 col-6 u-col">
               <div class="c-product">
                 <div class="c-product__img">
-                  <UiCImage :src="productImage1" alt="branded product" width="282" height="422" loading="lazy" decoding="async" />
+                  <img src="~/assets/img/223.png" alt="branded product" width="300" height="450" loading="lazy" decoding="async">
                 </div>
               </div>
             </div>
             <div class="col-lg-3 col-md-3 col-6 u-col">
               <div class="c-product">
                 <div class="c-product__img">
-                  <UiCImage :src="productImage2" alt="branded product" width="282" height="422" loading="lazy" decoding="async" />
+                  <img src="~/assets/img/224.png" alt="branded product" width="300" height="450" loading="lazy" decoding="async">
                 </div>
               </div>
             </div>
             <div class="col-lg-3 col-md-3 col-6 u-col">
               <div class="c-product">
                 <div class="c-product__img">
-                  <UiCImage :src="productImage3" alt="branded product" width="282" height="422" loading="lazy" decoding="async" />
+                  <img src="~/assets/img/225.png" alt="branded product" width="300" height="450" loading="lazy" decoding="async">
                 </div>
               </div>
             </div>
             <div class="col-lg-3 col-md-3 col-6 u-col">
               <div class="c-product">
                 <div class="c-product__img">
-                  <UiCImage :src="productImage4" alt="branded product" width="282" height="422" loading="lazy" decoding="async" />
+                  <img src="~/assets/img/2221.png" alt="branded product" width="300" height="450" loading="lazy" decoding="async">
                 </div>
               </div>
             </div>
@@ -61,10 +61,6 @@
 
 <script setup>
 import brandedBgImg from '~/assets/img/9130.jpg'
-import productImage1 from '~/assets/img/223.png'
-import productImage2 from '~/assets/img/224.png'
-import productImage3 from '~/assets/img/225.png'
-import productImage4 from '~/assets/img/2221.png'
 
 const localePath = useLocalePath()
 </script>

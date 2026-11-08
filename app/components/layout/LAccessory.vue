@@ -9,26 +9,26 @@
 
       <div class="text-center">
         <div class="l-accessory__bg">
-          <UiCImage
-            :src="accessoryBackground"
+          <img
+            src="~/assets/img/accessory1.jpg"
             alt="accessory background"
             height="829"
             width="824"
             loading="lazy"
             decoding="async"
-          />
+          >
           <NuxtLink :to="siteLink('accessories')" class="c-circle">
             <svg width="61px" height="19px" class="c-circle__arrow">
               <use xlink:href="#small-arrow"></use>
             </svg>
-            <UiCImage
-              :src="circleImage"
+            <img
+              src="~/assets/img/circle-img.png"
               alt="circle image"
               width="251"
               height="251"
               loading="lazy"
               decoding="async"
-            />
+            >
           </NuxtLink>
         </div>
       </div>
@@ -47,7 +47,7 @@
           </svg>
         </div>
         <picture style="padding: 12px; background-color: white;">
-          <UiCImage
+          <img
             :src="item.img"
             :alt="item.title || $t('home.accessories_alt')"
             :height="item.image_dimensions?.height || 300"
@@ -55,7 +55,7 @@
             :style="{ width: `${index === 1 ? 330 : 300}px` }"
             loading="lazy"
             decoding="async"
-          />
+          >
         </picture>
       </NuxtLink>
     </div>
@@ -63,9 +63,6 @@
 </template>
 
 <script setup>
-import accessoryBackground from '~/assets/img/accessory1.jpg'
-import circleImage from '~/assets/img/circle-img.png'
-
 const props = defineProps({
   data: { type: Array },
 })

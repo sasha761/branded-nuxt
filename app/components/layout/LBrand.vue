@@ -1,6 +1,6 @@
 <template>
   <section class="l-brand">
-    <UiCImage class="l-brand__img d-lg-block d-none" :src="brandBgImg" alt="" loading="lazy" />
+    <div class="l-brand__img d-lg-block d-none" :style="{ 'background-image': `url(${brandBgImg})` }"></div>
 
     <div class="u-container">
       <div class="l-brand__content js-slider-container">

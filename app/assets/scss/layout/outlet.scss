@@ -69,17 +69,10 @@
 
 			.c-outlet picture {
 				display: block;
-				position: relative;
 				aspect-ratio: 5 / 6;
 			}
 
-			.c-outlet picture > img {
-				display: block;
-				position: absolute;
-				inset: 0;
-				height: 100%;
-				object-fit: cover;
-			}
+			.c-outlet img { display: block; }
 
 			.is-title {
 				margin-bottom: auto;

@@ -26,7 +26,7 @@
 <script setup>
 import Swiper from 'swiper'
 import { Autoplay } from 'swiper/modules'
-import productRowBackgroundUrl from '~/assets/img/product-row-bg.png'
+import productRowBackground from '~/assets/img/product-row-bg.png'
 
 const props = defineProps({
   data: { type: Array },
@@ -36,11 +36,8 @@ const productRow = ref(null)
 const { loadedSlides, watchCarousel } = useVisibleCarousel()
 let swiperInstance = null
 
-// Vite формирует абсолютный URL на клиенте, а SSR — относительный. Сохраняем адрес из SSR.
-const productRowBackground = useState('home:product-row-background', () => productRowBackgroundUrl)
-
 // На мобильном этот фон попадает в первый экран и является LCP.
-useHead({ link: [{ rel: 'preload', as: 'image', href: productRowBackground.value, media: '(max-width: 991px)', fetchpriority: 'high' }] })
+useHead({ link: [{ rel: 'preload', as: 'image', href: productRowBackground, media: '(max-width: 991px)', fetchpriority: 'high' }] })
 
 onMounted(() => {
   if (productRow.value) {

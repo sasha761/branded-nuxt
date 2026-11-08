@@ -10,26 +10,26 @@
       class="c-product__img"
       @click="emit('select', product)"
     >
-      <picture ref="picture" :style="{ '--card-ratio': `${cardImage.width} / ${cardImage.height}`, '--card-mobile-ratio': `${cardImage.mobileWidth} / ${cardImage.mobileHeight}` }">
+      <picture :style="{ '--card-ratio': `${cardImage.width} / ${cardImage.height}`, '--card-mobile-ratio': `${cardImage.mobileWidth} / ${cardImage.mobileHeight}` }">
         <source
           v-if="cardImage.desktop"
-          :srcset="canLoad ? cardImage.desktop : undefined"
-          :data-srcset="!canLoad ? cardImage.desktop : undefined"
+          :srcset="loadImage ? cardImage.desktop : undefined"
+          :data-srcset="!loadImage ? cardImage.desktop : undefined"
           :width="cardImage.width"
           :height="cardImage.height"
           media="(min-width: 426px)"
         />
         <source
           v-if="cardImage.mobile"
-          :srcset="canLoad ? cardImage.mobile : undefined"
-          :data-srcset="!canLoad ? cardImage.mobile : undefined"
+          :srcset="loadImage ? cardImage.mobile : undefined"
+          :data-srcset="!loadImage ? cardImage.mobile : undefined"
           :width="cardImage.mobileWidth"
           :height="cardImage.mobileHeight"
           media="(max-width: 425px)"
         />
         <img
-          :src="canLoad ? cardImage.src : undefined"
-          :data-src="!canLoad ? cardImage.src : undefined"
+          :src="loadImage ? cardImage.src : undefined"
+          :data-src="!loadImage ? cardImage.src : undefined"
           :alt="cardImage.alt"
           :title="product.name"
           :width="cardImage.width"
@@ -64,14 +64,11 @@ const props = defineProps({
   // Первые карточки в видимой области грузятся сразу (LCP архива)
   eager: { type: Boolean, default: false },
   priority: { type: Boolean, default: false },
-  loadImage: { type: Boolean, default: undefined },
+  loadImage: { type: Boolean, default: true },
 })
 
 const emit = defineEmits(['select'])
 const { t } = useI18n()
-const picture = ref(null)
-const near = useImageViewport(picture, () => props.eager || props.loadImage !== undefined)
-const canLoad = computed(() => props.loadImage === undefined ? props.eager || near.value : props.loadImage)
 
 // archive_xl (532×665) для экранов шире 425px, archive_md (420×504) для узких — как в теме WP
 const cardImage = computed(() => {

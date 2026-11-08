@@ -9,12 +9,12 @@
           <div class="row">
             <div class="col-lg-6">
               <NuxtLink :to="siteLink('accessories')" class="c-outlet">
-                <UiCImage :src="bagsImage1" alt="bags branded" width="390" height="390" loading="lazy" decoding="async" />
+                <img src="~/assets/img/bags1.jpg" alt="bags branded" width="390" height="390" loading="lazy" decoding="async">
               </NuxtLink>
             </div>
             <div class="col-lg-6">
               <NuxtLink :to="siteLink('accessories')" class="c-outlet">
-                <UiCImage :src="bagsImage2" alt="bags branded" width="390" height="390" loading="lazy" decoding="async" />
+                <img src="~/assets/img/bags2.jpg" alt="bags branded" width="390" height="390" loading="lazy" decoding="async">
               </NuxtLink>
             </div>
           </div>
@@ -76,8 +76,6 @@
 <script setup>
 import Swiper from 'swiper'
 import { Autoplay } from 'swiper/modules'
-import bagsImage1 from '~/assets/img/bags1.jpg'
-import bagsImage2 from '~/assets/img/bags2.jpg'
 
 const props = defineProps({
   data: { type: Array },
