@@ -1,8 +1,8 @@
 <template>
   <section class="l-subs">
-    <img
+    <UiCImage
       class="is-img"
-      src="~/assets/img/subs.jpg"
+      :src="subscribeImage"
       :alt="t('subscribe.image_alt')"
       width="1920"
       height="647"
@@ -34,6 +34,8 @@
 </template>
 
 <script setup>
+import subscribeImage from '~/assets/img/subs.jpg'
+
 const { t } = useI18n()
 const { requestInProgress, waitRequest } = useWaitRequest()
 

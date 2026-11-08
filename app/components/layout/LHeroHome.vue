@@ -37,26 +37,26 @@
             <!-- Раньше вели на удалённые товары BeOm (404 и на живом сайте) -->
             <NuxtLink :to="siteLink('brandBeom')" class="c-banner">
               <picture>
-                <img
+                <UiCImage
                   :src="data.small_banner_1"
                   :width="data.small_banner_1_dimensions?.width || 965"
                   :height="data.small_banner_1_dimensions?.height || 815"
                   :alt="$t('home.small_banner_1_alt')"
                   loading="lazy"
                   decoding="async"
-                >
+                />
               </picture>
             </NuxtLink>
             <NuxtLink :to="siteLink('brandBeom')" class="c-banner">
               <picture>
-                <img
+                <UiCImage
                   :src="data.small_banner_2"
                   :width="data.small_banner_2_dimensions?.width || 965"
                   :height="data.small_banner_2_dimensions?.height || 620"
                   :alt="$t('home.small_banner_2_alt')"
                   loading="lazy"
                   decoding="async"
-                >
+                />
               </picture>
             </NuxtLink>
           </div>

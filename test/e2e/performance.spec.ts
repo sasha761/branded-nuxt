@@ -59,6 +59,9 @@ test('lazy-load, вариативные шрифты и критический C
   const imagePreloads = home.querySelectorAll('link[rel="preload"][as="image"]')
   expect(imagePreloads.every(link => link.getAttribute('fetchpriority') === 'high')).toBe(true)
   expect(imagePreloads.find(link => link.getAttribute('href') === background.getAttribute('src'))?.getAttribute('media')).toBe('(max-width: 991px)')
+  for (const image of home.querySelectorAll('.l-products-row .swiper img, .l-brand .swiper img, .l-outlet .swiper img')) {
+    expect(image.hasAttribute('src'), image.outerHTML).toBe(false)
+  }
   const cards = archive.querySelectorAll('.c-product img')
   expect(cards.length).toBeGreaterThan(4)
   expect(cards[0]?.getAttribute('fetchpriority')).toBe('high')
@@ -78,7 +81,7 @@ test('lazy-изображения отображаются после прокр
 
   const background = page.locator('.l-branded__img')
   expect((await background.boundingBox())!.y).toBeGreaterThan(2400)
-  // Браузер сам выбирает расстояние предварительной загрузки в зависимости от сети.
+  // URL появляется при приближении к экрану; loading="lazy" сохраняется как страховка.
   expect(await background.getAttribute('loading')).toBe('lazy')
   await background.scrollIntoViewIfNeeded()
   await expect.poll(() => background.evaluate(image => (image as HTMLImageElement).naturalWidth)).toBeGreaterThan(0)

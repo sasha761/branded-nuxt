@@ -1,18 +1,33 @@
 import type Swiper from 'swiper'
+import { useIntersectionObserver } from '@vueuse/core'
 
-/** Первые карточки остаются в SSR, дальние подключаются по мере просмотра карусели. */
+/** URL карточек подключаются только при приближении карусели к viewport. */
 export function useVisibleCarousel() {
-  const loadedSlides = ref(new Set([0, 1, 2, 3]))
+  const loadedSlides = ref(new Set<number>())
+  const config = useAppConfig()
   let swiper: Swiper | undefined
-  let observer: IntersectionObserver | undefined
+  const target = shallowRef<HTMLElement | null>(null)
   let visible = false
+  let near = false
   let userStopped = false
   let managingStop = false
 
+  useIntersectionObserver(target, ([entry]) => {
+    visible = Boolean(entry?.isIntersecting)
+    if (visible) near = true
+    loadNearby()
+    syncAutoplay()
+  })
+  useIntersectionObserver(target, ([entry]) => {
+    near = Boolean(entry?.isIntersecting)
+    loadNearby()
+  }, { rootMargin: () => imageViewportMargin(config.imageLoading.viewportOffset) })
+
   function loadNearby() {
-    if (!visible || !swiper || swiper.destroyed || !swiper.slides.length) return
+    if (!near || !swiper || swiper.destroyed || !swiper.slides.length) return
     const count = Math.max(1, swiper.slidesPerViewDynamic())
-    for (let index = Math.max(0, swiper.activeIndex - 1); index <= Math.min(swiper.slides.length - 1, swiper.activeIndex + count); index++) {
+    const neighbors = Math.max(0, Math.floor(config.imageLoading.carouselNeighbors))
+    for (let index = Math.max(0, swiper.activeIndex - neighbors); index < Math.min(swiper.slides.length, swiper.activeIndex + count + neighbors); index++) {
       loadedSlides.value.add(index)
     }
   }
@@ -40,22 +55,17 @@ export function useVisibleCarousel() {
     swiper.on('slidesUpdated', loadNearby)
     swiper.on('autoplayStop', onAutoplayStop)
     document.addEventListener('visibilitychange', syncAutoplay)
+    target.value = swiper.el
     if (typeof IntersectionObserver === 'undefined') {
       visible = true
+      near = true
       loadNearby()
       syncAutoplay()
       return
     }
-    observer = new IntersectionObserver(([entry]) => {
-      visible = Boolean(entry?.isIntersecting)
-      loadNearby()
-      syncAutoplay()
-    })
-    observer.observe(swiper.el)
   }
 
   onBeforeUnmount(() => {
-    observer?.disconnect()
     document.removeEventListener('visibilitychange', syncAutoplay)
     if (swiper && !swiper.destroyed) {
       managingStop = true
