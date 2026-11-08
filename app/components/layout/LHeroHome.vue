@@ -15,8 +15,8 @@
                   <img
                     :src="loadedBannerIndexes.has(index) ? item.img : undefined"
                     :data-src="index > 0 ? item.img : undefined"
-                    width="1400"
-                    height="616"
+                    :width="item.image_dimensions?.width || 1280"
+                    :height="item.image_dimensions?.height || 720"
                     :alt="$t('home.banner_alt', { n: index + 1 })"
                     :fetchpriority="index === 0 ? 'high' : 'low'"
                     :loading="index === 0 ? 'eager' : 'lazy'"
@@ -39,8 +39,8 @@
               <picture>
                 <img
                   :src="data.small_banner_1"
-                  width="360"
-                  height="234"
+                  :width="data.small_banner_1_dimensions?.width || 965"
+                  :height="data.small_banner_1_dimensions?.height || 815"
                   :alt="$t('home.small_banner_1_alt')"
                   loading="lazy"
                   decoding="async"
@@ -51,8 +51,8 @@
               <picture>
                 <img
                   :src="data.small_banner_2"
-                  width="360"
-                  height="234"
+                  :width="data.small_banner_2_dimensions?.width || 965"
+                  :height="data.small_banner_2_dimensions?.height || 620"
                   :alt="$t('home.small_banner_2_alt')"
                   loading="lazy"
                   decoding="async"
@@ -84,7 +84,7 @@ const firstBannerImg = computed(() => props.data?.banners?.[0]?.img)
 useHead({
   link: computed(() =>
     firstBannerImg.value
-      ? [{ rel: 'preload', as: 'image', href: firstBannerImg.value }]
+      ? [{ rel: 'preload', as: 'image', href: firstBannerImg.value, fetchpriority: 'high' }]
       : []
   ),
 })

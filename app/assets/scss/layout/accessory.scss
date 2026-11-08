@@ -16,9 +16,14 @@
 		position: relative;
 		text-align: center;
 		display: inline-block;
+		width: 824px;
+		max-width: 100%;
+		aspect-ratio: 824 / 829;
 
-		img {
+		> img {
+			display: block;
 			width: 100%;
+			aspect-ratio: 824 / 829;
 		}
 	}
 	.c-circle {

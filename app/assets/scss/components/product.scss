@@ -12,12 +12,27 @@
     overflow: hidden;
 
   	picture {
+      display: block;
+      position: relative;
+      aspect-ratio: var(--card-ratio, auto);
   		line-height: 0;
 	  	background-image: url(data:image/gif;base64,R0lGODlhCgAIAIABAN3d3f///yH5BAEAAAEALAAAAAAKAAgAAAINjAOnyJv2oJOrVXrzKQA7);
   	}
 
     img {
     	width: 100%;
+      display: block;
+    }
+
+    picture > img {
+      position: absolute;
+      inset: 0;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    @media (max-width: 425px) {
+      picture { aspect-ratio: var(--card-mobile-ratio, auto); }
     }
 	}
 

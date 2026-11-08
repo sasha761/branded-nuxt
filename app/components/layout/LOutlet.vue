@@ -9,12 +9,12 @@
           <div class="row">
             <div class="col-lg-6">
               <NuxtLink :to="siteLink('accessories')" class="c-outlet">
-                <img src="~/assets/img/bags1.jpg" alt="bags branded" width="400" height="400" loading="lazy" decoding="async">
+                <img src="~/assets/img/bags1.jpg" alt="bags branded" width="390" height="390" loading="lazy" decoding="async">
               </NuxtLink>
             </div>
             <div class="col-lg-6">
               <NuxtLink :to="siteLink('accessories')" class="c-outlet">
-                <img src="~/assets/img/bags2.jpg" alt="bags branded" width="400" height="400" loading="lazy" decoding="async">
+                <img src="~/assets/img/bags2.jpg" alt="bags branded" width="390" height="390" loading="lazy" decoding="async">
               </NuxtLink>
             </div>
           </div>
@@ -53,7 +53,15 @@
                   class="c-outlet"
                 >
                   <picture>
-                    <img :src="outlet.post_img_m" :alt="outlet.name" width="400" height="440" loading="lazy" decoding="async">
+                    <img
+                      :src="loadedSlides.has(index) ? outlet.post_img_m : undefined"
+                      :data-src="outlet.post_img_m"
+                      :alt="outlet.name"
+                      :width="outlet.image?.sizes?.archive_md?.width || 420"
+                      :height="outlet.image?.sizes?.archive_md?.height || 504"
+                      loading="lazy"
+                      decoding="async"
+                    >
                   </picture>
                 </NuxtLink>
               </div>
@@ -75,6 +83,7 @@ const props = defineProps({
 
 const siteLink = useSiteLink()
 const outletSlider = ref(null)
+const { loadedSlides, watchCarousel } = useVisibleCarousel()
 let swiperInstance = null
 
 const currentSlideIndex = ref(1)
@@ -87,6 +96,7 @@ onMounted(() => {
       slidesPerView: 'auto',
       watchOverflow: true,
       autoplay: {
+        enabled: false,
         delay: 2500,
         stopOnLastSlide: false,
         disableOnInteraction: true,
@@ -100,6 +110,7 @@ onMounted(() => {
         },
       },
     })
+    watchCarousel(swiperInstance)
   }
 })
 

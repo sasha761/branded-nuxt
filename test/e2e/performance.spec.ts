@@ -37,6 +37,7 @@ test('lazy-load, вариативные шрифты и критический C
     expect(inlineCss).toContain('.c-page-loader')
     expect(inlineCss).toContain('.loader-outter')
     expect(document.querySelectorAll('link[rel="stylesheet"]')).toHaveLength(0)
+    expect(document.querySelectorAll('link[rel="prefetch"][as="image"]')).toHaveLength(0)
   }
 
   expect(home.querySelector('.l-hero img')?.getAttribute('loading')).toBe('eager')
@@ -49,9 +50,15 @@ test('lazy-load, вариативные шрифты и критический C
     expect(banner.getAttribute('loading')).toBe('lazy')
   }
   expect(home.querySelector('.l-branded__img')?.getAttribute('loading')).toBe('lazy')
-  for (const image of home.querySelectorAll('.l-accessory img, .l-outlet img, .l-branded img, .l-products-row img')) {
+  for (const image of home.querySelectorAll('.l-accessory img, .l-outlet img, .l-branded img, .l-products-row .c-product img')) {
     expect(image.getAttribute('loading'), image.outerHTML).toBe('lazy')
   }
+  const background = home.querySelector('.l-products-row > img')!
+  expect(background.getAttribute('loading')).toBe('eager')
+  expect(background.getAttribute('fetchpriority')).toBe('high')
+  const imagePreloads = home.querySelectorAll('link[rel="preload"][as="image"]')
+  expect(imagePreloads.every(link => link.getAttribute('fetchpriority') === 'high')).toBe(true)
+  expect(imagePreloads.find(link => link.getAttribute('href') === background.getAttribute('src'))?.getAttribute('media')).toBe('(max-width: 991px)')
   const cards = archive.querySelectorAll('.c-product img')
   expect(cards.length).toBeGreaterThan(4)
   expect(cards[0]?.getAttribute('fetchpriority')).toBe('high')
@@ -93,7 +100,8 @@ for (const width of [390, 1440]) {
     const homeResponse = await request.get('/')
     expect(homeResponse.status()).toBe(200)
     const html = parse(await homeResponse.text())
-    const bannerUrls = html.querySelectorAll('.l-hero .swiper-wrapper img')
+    const bannerImages = html.querySelectorAll('.l-hero .swiper-wrapper img')
+    const bannerUrls = bannerImages
       .map(image => new URL(image.getAttribute('src') || image.getAttribute('data-src')!, homeResponse.url()).href)
     expect(bannerUrls.length).toBeGreaterThan(2)
     expect(new Set(bannerUrls).size).toBe(bannerUrls.length)
@@ -102,9 +110,10 @@ for (const width of [390, 1440]) {
     const requested: string[] = []
     await page.route(url => bannerUrls.includes(url.href), async (route) => {
       requested.push(route.request().url())
+      const image = bannerImages[bannerUrls.indexOf(route.request().url())]!
       await route.fulfill({
         contentType: 'image/svg+xml',
-        body: '<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="616"/>',
+        body: `<svg xmlns="http://www.w3.org/2000/svg" width="${image.getAttribute('width')}" height="${image.getAttribute('height')}"/>`,
       })
     })
     const errors: string[] = []

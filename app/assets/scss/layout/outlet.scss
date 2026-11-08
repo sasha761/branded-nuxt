@@ -67,6 +67,13 @@
 			display: flex;	
 			flex-direction: column;
 
+			.c-outlet picture {
+				display: block;
+				aspect-ratio: 5 / 6;
+			}
+
+			.c-outlet img { display: block; }
+
 			.is-title {
 				margin-bottom: auto;
 			}

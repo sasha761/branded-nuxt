@@ -12,8 +12,8 @@
           <img
             src="~/assets/img/accessory1.jpg"
             alt="accessory background"
-            height="830"
-            width="825"
+            height="829"
+            width="824"
             loading="lazy"
             decoding="async"
           >
@@ -50,8 +50,9 @@
           <img
             :src="item.img"
             :alt="item.title || $t('home.accessories_alt')"
-            height="300"
-            :width="index === 0 ? 300 : (index === 1 ? 330 : 300)"
+            :height="item.image_dimensions?.height || 300"
+            :width="item.image_dimensions?.width || (index === 1 ? 330 : 300)"
+            :style="{ width: `${index === 1 ? 330 : 300}px` }"
             loading="lazy"
             decoding="async"
           >

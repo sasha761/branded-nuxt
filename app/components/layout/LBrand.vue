@@ -32,8 +32,8 @@
 
         <div ref="productRowSlider" class="row swiper">
           <div class="swiper-wrapper">
-            <div v-for="product in data" :key="product.id" class="col-lg-4 col-md-4 col-sm-6 col-6 u-col swiper-slide">
-              <UiCProduct :product="product" />
+            <div v-for="(product, index) in data" :key="product.id" class="col-lg-4 col-md-4 col-sm-6 col-6 u-col swiper-slide">
+              <UiCProduct :product="product" :load-image="loadedSlides.has(index)" />
             </div>
           </div>
         </div>
@@ -53,6 +53,7 @@ const props = defineProps({
 
 const siteLink = useSiteLink()
 const productRowSlider = ref(null)
+const { loadedSlides, watchCarousel } = useVisibleCarousel()
 let swiperInstance = null
 
 const currentSlideIndex = ref(1)
@@ -65,6 +66,7 @@ onMounted(() => {
       slidesPerView: 'auto',
       watchOverflow: true,
       autoplay: {
+        enabled: false,
         delay: 2500,
         stopOnLastSlide: false,
         disableOnInteraction: true,
@@ -78,6 +80,7 @@ onMounted(() => {
         },
       },
     })
+    watchCarousel(swiperInstance)
   }
 })
 

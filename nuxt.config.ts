@@ -59,6 +59,8 @@ export default defineNuxtConfig({
     // Только сервер. На VPS — внутренний адрес WP (NUXT_WP_SITE_URL=http://127.0.0.1:8081).
     wpSiteUrl: process.env.WP_SITE_URL || 'https://branded.com.ua',
     wpTimeout: 8000,
+    // Метаданные баннеров читаются из заголовков файлов, без скачивания всего изображения.
+    wpUploadsDir: '/srv/branded/wordpress/wp-content/uploads',
     // = BRANDED_BFF_SECRET в wp-config.php: WP доверяет IP клиента из X-Branded-Client-IP
     bffSecret: '',
     // = BRANDED_REVALIDATE_SECRET в wp-config.php
@@ -101,6 +103,12 @@ export default defineNuxtConfig({
   },
 
   hooks: {
+    'build:manifest'(manifest) {
+      // Prefetch из head иначе скачивает даже скрытые и loading="lazy" изображения.
+      for (const resource of Object.values(manifest)) {
+        if (resource.resourceType === 'image') resource.prefetch = false
+      }
+    },
     // Кеш API — только в production-сборке. В dev кеш Nitro лежит на диске (.nuxt/cache) и переживает
     // перезапуск: после смены NUXT_WP_SITE_URL или правки в админке отдавались бы старые ответы.
     // ($production в конфиге не подходит: nuxi build читает конфиг до установки NODE_ENV.)

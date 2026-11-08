@@ -10,19 +10,26 @@
       class="c-product__img"
       @click="emit('select', product)"
     >
-      <picture>
+      <picture :style="{ '--card-ratio': `${cardImage.width} / ${cardImage.height}`, '--card-mobile-ratio': `${cardImage.mobileWidth} / ${cardImage.mobileHeight}` }">
         <source
           v-if="cardImage.desktop"
-          :srcset="cardImage.desktop"
+          :srcset="loadImage ? cardImage.desktop : undefined"
+          :data-srcset="!loadImage ? cardImage.desktop : undefined"
+          :width="cardImage.width"
+          :height="cardImage.height"
           media="(min-width: 426px)"
         />
         <source
           v-if="cardImage.mobile"
-          :srcset="cardImage.mobile"
+          :srcset="loadImage ? cardImage.mobile : undefined"
+          :data-srcset="!loadImage ? cardImage.mobile : undefined"
+          :width="cardImage.mobileWidth"
+          :height="cardImage.mobileHeight"
           media="(max-width: 425px)"
         />
         <img
-          :src="cardImage.src"
+          :src="loadImage ? cardImage.src : undefined"
+          :data-src="!loadImage ? cardImage.src : undefined"
           :alt="cardImage.alt"
           :title="product.name"
           :width="cardImage.width"
@@ -57,6 +64,7 @@ const props = defineProps({
   // Первые карточки в видимой области грузятся сразу (LCP архива)
   eager: { type: Boolean, default: false },
   priority: { type: Boolean, default: false },
+  loadImage: { type: Boolean, default: true },
 })
 
 const emit = defineEmits(['select'])
@@ -75,6 +83,8 @@ const cardImage = computed(() => {
     alt: image?.alt || props.product.name,
     width: desktop?.width || 532,
     height: desktop?.height || 665,
+    mobileWidth: mobile?.width || 420,
+    mobileHeight: mobile?.height || 504,
   }
 })
 </script>
